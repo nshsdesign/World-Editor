@@ -1,49 +1,72 @@
 package skybox;
 
-import models.RawModel;
-
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.util.vector.Matrix4f;
 
+import entities.Camera;
+import models.RawModel;
 import renderEngine.DisplayManager;
 import renderEngine.Loader;
-import entities.Camera;
 
 public class SkyboxRenderer {
-
+	
 	private static final float SIZE = 500f;
+	
+	private static final float[] VERTICES = {        
+	    -SIZE,  SIZE, -SIZE,
+	    -SIZE, -SIZE, -SIZE,
+	    SIZE, -SIZE, -SIZE,
+	     SIZE, -SIZE, -SIZE,
+	     SIZE,  SIZE, -SIZE,
+	    -SIZE,  SIZE, -SIZE,
 
-	private static final float[] VERTICES = { -SIZE, SIZE, -SIZE, -SIZE, -SIZE,
-			-SIZE, SIZE, -SIZE, -SIZE, SIZE, -SIZE, -SIZE, SIZE, SIZE, -SIZE,
-			-SIZE, SIZE, -SIZE,
+	    -SIZE, -SIZE,  SIZE,
+	    -SIZE, -SIZE, -SIZE,
+	    -SIZE,  SIZE, -SIZE,
+	    -SIZE,  SIZE, -SIZE,
+	    -SIZE,  SIZE,  SIZE,
+	    -SIZE, -SIZE,  SIZE,
 
-			-SIZE, -SIZE, SIZE, -SIZE, -SIZE, -SIZE, -SIZE, SIZE, -SIZE, -SIZE,
-			SIZE, -SIZE, -SIZE, SIZE, SIZE, -SIZE, -SIZE, SIZE,
+	     SIZE, -SIZE, -SIZE,
+	     SIZE, -SIZE,  SIZE,
+	     SIZE,  SIZE,  SIZE,
+	     SIZE,  SIZE,  SIZE,
+	     SIZE,  SIZE, -SIZE,
+	     SIZE, -SIZE, -SIZE,
 
-			SIZE, -SIZE, -SIZE, SIZE, -SIZE, SIZE, SIZE, SIZE, SIZE, SIZE,
-			SIZE, SIZE, SIZE, SIZE, -SIZE, SIZE, -SIZE, -SIZE,
+	    -SIZE, -SIZE,  SIZE,
+	    -SIZE,  SIZE,  SIZE,
+	     SIZE,  SIZE,  SIZE,
+	     SIZE,  SIZE,  SIZE,
+	     SIZE, -SIZE,  SIZE,
+	    -SIZE, -SIZE,  SIZE,
 
-			-SIZE, -SIZE, SIZE, -SIZE, SIZE, SIZE, SIZE, SIZE, SIZE, SIZE,
-			SIZE, SIZE, SIZE, -SIZE, SIZE, -SIZE, -SIZE, SIZE,
+	    -SIZE,  SIZE, -SIZE,
+	     SIZE,  SIZE, -SIZE,
+	     SIZE,  SIZE,  SIZE,
+	     SIZE,  SIZE,  SIZE,
+	    -SIZE,  SIZE,  SIZE,
+	    -SIZE,  SIZE, -SIZE,
 
-			-SIZE, SIZE, -SIZE, SIZE, SIZE, -SIZE, SIZE, SIZE, SIZE, SIZE,
-			SIZE, SIZE, -SIZE, SIZE, SIZE, -SIZE, SIZE, -SIZE,
-
-			-SIZE, -SIZE, -SIZE, -SIZE, -SIZE, SIZE, SIZE, -SIZE, -SIZE, SIZE,
-			-SIZE, -SIZE, -SIZE, -SIZE, SIZE, SIZE, -SIZE, SIZE };
-
-	private static String[] TEXTURE_FILES = { "right", "left", "top", "bottom",
-		"back", "front" };
-	private static String[] NIGHT_TEXTURE_FILES = { "nightRight", "nightLeft", "nightTop", "nightBottom",
-		"nightBack", "nightFront" };
+	    -SIZE, -SIZE, -SIZE,
+	    -SIZE, -SIZE,  SIZE,
+	     SIZE, -SIZE, -SIZE,
+	     SIZE, -SIZE, -SIZE,
+	    -SIZE, -SIZE,  SIZE,
+	     SIZE, -SIZE,  SIZE
+	};
+	
+	private static String[] TEXTURE_FILES = {"right", "left", "top", "bottom", "back", "front"};
+	private static String[] NIGHT_TEXTURE_FILES = {"nightRight", "nightLeft", "nightTop", "nightBottom", "nightBack", "nightFront"};
+	
 	private RawModel cube;
 	private int texture;
 	private int nightTexture;
 	private SkyboxShader shader;
-	private float time = 0;
+	private float time =0;
 	
 	public SkyboxRenderer(Loader loader, Matrix4f projectionMatrix){
 		cube = loader.loadToVAO(VERTICES, 3);
@@ -59,7 +82,7 @@ public class SkyboxRenderer {
 	public void render(Camera camera, float r, float g, float b){
 		shader.start();
 		shader.loadViewMatrix(camera);
-		shader.loadFogColor(r, g, b);
+		shader.loadFogColour(r, g, b);
 		GL30.glBindVertexArray(cube.getVaoID());
 		GL20.glEnableVertexAttribArray(0);
 		bindTextures();
@@ -70,27 +93,27 @@ public class SkyboxRenderer {
 	}
 	
 	private void bindTextures(){
-		time += DisplayManager.getFrameTimeSeconds();
-		time %= 24 * 60;
+		time += DisplayManager.getFrameTimeSeconds() * 1000;
+		time %= 24000;
 		int texture1;
 		int texture2;
 		float blendFactor;		
-		if(time >= 0 && time < 5 * 60){
-			texture1 = nightTexture;
-			texture2 = nightTexture;
-			blendFactor = (time - 0)/(5 * 60 - 0);
-		}else if(time >= 5 * 60 && time < 8 * 60){
-			texture1 = nightTexture;
-			texture2 = texture;
-			blendFactor = (time - 5 * 60)/(8 * 60 - 5 * 60);
-		}else if(time >= 8 * 60 && time < 21 * 60){
+		if(time >= 0 && time < 5000){
 			texture1 = texture;
 			texture2 = texture;
-			blendFactor = (time - 8 * 60)/(21 * 60 - 8 * 60);
+			blendFactor = (time - 0)/(5000 - 0);
+		}else if(time >= 5000 && time < 8000){
+			texture1 = texture;
+			texture2 = texture;
+			blendFactor = (time - 5000)/(8000 - 5000);
+		}else if(time >= 8000 && time < 21000){
+			texture1 = texture;
+			texture2 = texture;
+			blendFactor = (time - 8000)/(21000 - 8000);
 		}else{
 			texture1 = texture;
-			texture2 = nightTexture;
-			blendFactor = (time - 21 * 60)/(24 * 60 - 21 * 60);
+			texture2 = texture;
+			blendFactor = (time - 21000)/(24000 - 21000);
 		}
 
 		GL13.glActiveTexture(GL13.GL_TEXTURE0);
@@ -100,4 +123,7 @@ public class SkyboxRenderer {
 		shader.loadBlendFactor(blendFactor);
 	}
 	
+	
+	
+
 }

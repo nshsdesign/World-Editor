@@ -1,9 +1,11 @@
 package water;
 
 import org.lwjgl.util.vector.Matrix4f;
+
 import shaders.ShaderProgram;
 import toolbox.Maths;
 import entities.Camera;
+import entities.Light;
 
 public class WaterShader extends ShaderProgram {
 
@@ -17,6 +19,11 @@ public class WaterShader extends ShaderProgram {
 	private int location_refractionTexture;
 	private int location_dudvMap;
 	private int location_moveFactor;
+	private int location_cameraPosition;
+	private int location_normalMap;
+	private int location_lightPosition;
+	private int location_lightColour;
+	private int location_depthMap;
 
 	public WaterShader() {
 		super(VERTEX_FILE, FRAGMENT_FILE);
@@ -36,12 +43,24 @@ public class WaterShader extends ShaderProgram {
 		location_refractionTexture = getUniformLocation("refractionTexture");
 		location_dudvMap = getUniformLocation("dudvMap");
 		location_moveFactor = getUniformLocation("moveFactor");
+		location_cameraPosition = getUniformLocation("cameraPosition");
+		location_normalMap = getUniformLocation("normalMap");
+		location_lightPosition = getUniformLocation("lightPosition");
+		location_lightColour = getUniformLocation("lightColour");
+		location_depthMap = getUniformLocation("depthMap");
 	}
-
-	public void connectTextureUnits() {
+	
+	public void connectTextureUnits(){
 		super.loadInt(location_reflectionTexture, 0);
 		super.loadInt(location_refractionTexture, 1);
 		super.loadInt(location_dudvMap, 2);
+		super.loadInt(location_normalMap, 3);
+		super.loadInt(location_depthMap, 4);
+	}
+	
+	public void loadLight(Light light){
+		super.loadVector(location_lightColour, light.getColour());
+		super.loadVector(location_lightPosition, light.getPosition());
 	}
 	
 	public void loadMoveFactor(float factor){
@@ -51,13 +70,14 @@ public class WaterShader extends ShaderProgram {
 	public void loadProjectionMatrix(Matrix4f projection) {
 		loadMatrix(location_projectionMatrix, projection);
 	}
-
-	public void loadViewMatrix(Camera camera) {
+	
+	public void loadViewMatrix(Camera camera){
 		Matrix4f viewMatrix = Maths.createViewMatrix(camera);
 		loadMatrix(location_viewMatrix, viewMatrix);
+		super.loadVector(location_cameraPosition, camera.getPosition());
 	}
 
-	public void loadModelMatrix(Matrix4f modelMatrix) {
+	public void loadModelMatrix(Matrix4f modelMatrix){
 		loadMatrix(location_modelMatrix, modelMatrix);
 	}
 

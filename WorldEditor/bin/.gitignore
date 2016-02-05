@@ -1,5 +1,15 @@
+/entities/
+/guis/
+/main/
+/models/
+/normalMappingObjConverter/
+/normalMappingRenderer/
+/objConverter/
+/renderEngine/
+/shaders/
 /skybox/
-/terrain/
+/terrains/
 /textures/
 /toolbox/
 /water/
+/worldParser/

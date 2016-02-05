@@ -1,34 +1,89 @@
 package entities;
 
+import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.util.vector.Vector3f;
 
+import renderEngine.DisplayManager;
+
 public class Camera {
 	
-	public static final int YAW = 0;
-	
-	private static final float OFFSET_Y = 7;
+	private static final float MIN_ZOOM = 50;
+	private static final float MAX_ZOOM = 500;
 
 	private Vector3f position;
+	private float speed;
+	private float angleSpeed;
 	private float pitch;
 	private float yaw;
 	private float roll;
-	private Player player;
-	private float distanceFromPlayer = 200;
+	private float mouseWheelSensitivity;
+	private float zoomDistance;
+	private float dx;
+	private float dz;
 	
-	public Camera(Player player){
-		this.player = player;
-		position = new Vector3f(player.getPosition().x, player.getPosition().y + 100, player.getPosition().z - 70);
-		pitch = 45;
-		yaw = 180;
+	//FreeRoam
+	private static final float ANGLE_MOVE_SPEED = 50;
+	private static final float MOVE_SPEED = ANGLE_MOVE_SPEED;
+	
+	public Camera(){
+		position = new Vector3f(0,10,0);
+		
+		dx = 0;
+		dz = 0;
+		mouseWheelSensitivity = 0.1f;
+		Mouse.setGrabbed(false);
+		zoomDistance = 50;
+		pitch = 10;
+		yaw = 135;
 	}
 	
 	public void move(){
-		calculateZoom();
-        float horizontalDistance = calculateHorizontalDistance();
-        float verticleDistance = calculateVerticleDistance();
-        calculateCameraPosition(horizontalDistance, verticleDistance);
-		
+        speed = MOVE_SPEED * DisplayManager.getFrameTimeSeconds();
+        angleSpeed = ANGLE_MOVE_SPEED * DisplayManager.getFrameTimeSeconds();
+        handleInputs();
+        calculateZoom();
+        position.y = zoomDistance;
+    
+	}
+	
+	private void handleInputs(){
+		if(Keyboard.isKeyDown(Keyboard.KEY_W)){
+			dz = (float) (-speed * Math.cos(Math.toRadians(yaw)));
+			dx = (float) (speed * Math.sin(Math.toRadians(yaw)));
+			position.z+= dz;
+			position.x+= dx;
+		}
+		if(Keyboard.isKeyDown(Keyboard.KEY_S)){
+			dz = (float) (speed * Math.cos(Math.toRadians(yaw)));
+			dx = (float) (-speed * Math.sin(Math.toRadians(yaw)));
+			position.z+= dz;
+			position.x+= dx;
+		}
+		if(Keyboard.isKeyDown(Keyboard.KEY_D)){
+			dz = (float) (-speed * Math.cos(Math.toRadians(yaw+90)));
+			dx = (float) (speed * Math.sin(Math.toRadians(yaw+90)));
+			position.z+= dz;
+			position.x+= dx;
+		}
+		if(Keyboard.isKeyDown(Keyboard.KEY_A)){
+			dz = (float) (speed * Math.cos(Math.toRadians(yaw+90)));
+			dx = (float) (-speed * Math.sin(Math.toRadians(yaw+90)));
+			position.z+= dz;
+			position.x+= dx;
+		}
+		if(Keyboard.isKeyDown(Keyboard.KEY_Q)){
+			yaw -= angleSpeed;
+		}
+		if(Keyboard.isKeyDown(Keyboard.KEY_E)){
+			yaw += angleSpeed;
+		}
+		if(Keyboard.isKeyDown(Keyboard.KEY_R)){
+			pitch -= angleSpeed;
+		}
+		if(Keyboard.isKeyDown(Keyboard.KEY_F)){
+			pitch += angleSpeed;
+		}
 	}
 	
 	public void invertPitch(){
@@ -52,27 +107,8 @@ public class Camera {
 	}
 	
 	private void calculateZoom(){
-		float zoomLevel = Mouse.getDWheel() * 0.1f;
-		if(distanceFromPlayer-zoomLevel>=150 && distanceFromPlayer-zoomLevel<=300)distanceFromPlayer -= zoomLevel;
-	}
-	
-	private float calculateHorizontalDistance(){
-		return (float) (distanceFromPlayer * Math.cos(Math.toRadians(pitch)));
-	}
-	
-	private float calculateVerticleDistance(){
-		float vD = (float) (distanceFromPlayer * Math.sin(Math.toRadians(pitch)));
-		if(vD<0){
-			vD = 0;
-			pitch = 0;
-		}
-		return vD;
-	}
-	
-	private void calculateCameraPosition(float hDistance, float vDistance){
-		position.x = player.getPosition().x;
-		position.z = player.getPosition().z - hDistance;
-		position.y = player.getPosition().y + vDistance + OFFSET_Y;
+		float zoomLevel = Mouse.getDWheel() * mouseWheelSensitivity;
+		if(zoomDistance-zoomLevel>=MIN_ZOOM && zoomDistance-zoomLevel<=MAX_ZOOM)zoomDistance -= zoomLevel;
 	}
 	
 }

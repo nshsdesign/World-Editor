@@ -7,8 +7,8 @@ import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
-import terrain.Terrain;
 import entities.Camera;
+import terrains.Terrain;
 
 public class MousePicker {
 
@@ -21,14 +21,14 @@ public class MousePicker {
 	private Matrix4f viewMatrix;
 	private Camera camera;
 	
-	private Terrain[][] terrains;
+	private Terrain terrain;
 	private Vector3f currentTerrainPoint;
 
-	public MousePicker(Camera cam, Matrix4f projection, Terrain[][] terrains) {
+	public MousePicker(Camera cam, Matrix4f projection, Terrain terrain) {
 		camera = cam;
 		projectionMatrix = projection;
 		viewMatrix = Maths.createViewMatrix(camera);
-		this.terrains = terrains;
+		this.terrain = terrain;
 	}
 	
 	public Vector3f getCurrentTerrainPoint() {
@@ -130,9 +130,7 @@ public class MousePicker {
 	}
 
 	private Terrain getTerrain(float worldX, float worldZ) {
-		int x = (int) (worldX/Terrain.SIZE);
-		int z = (int) (worldZ/Terrain.SIZE);
-		return terrains[x][z];
+		return terrain;
 	}
 
 }

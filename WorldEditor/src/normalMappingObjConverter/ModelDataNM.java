@@ -1,6 +1,6 @@
-package objConverter;
+package normalMappingObjConverter;
 
-public class ModelData {
+public class ModelDataNM {
 
 	private float[] vertices;
 	private float[] textureCoords;
@@ -9,7 +9,7 @@ public class ModelData {
 	private int[] indices;
 	private float furthestPoint;
 
-	public ModelData(float[] vertices, float[] textureCoords, float[] normals, float[] tangents, int[] indices,
+	public ModelDataNM(float[] vertices, float[] textureCoords, float[] normals, float[] tangents, int[] indices,
 			float furthestPoint) {
 		this.vertices = vertices;
 		this.textureCoords = textureCoords;
