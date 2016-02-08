@@ -36,8 +36,8 @@ import org.apache.commons.io.FileUtils;
 @SuppressWarnings("serial")
 public class Main extends JFrame{
 	
-	public static final int WIDTH = 1000;
-	public static final int HEIGHT = 600;
+	public static final int WIDTH = 1280;
+	public static final int HEIGHT = 900;
 	
 	//ALL JComponents//
 	
@@ -65,18 +65,19 @@ public class Main extends JFrame{
 	private JTextField nameTF;
 	private JLabel nameLabel;
 	
-	public static final int STAT_MIN = 0;
+	public static final int STAT_MIN = -100;
 	public static final int STAT_MAX = 100;
 	public static final int STAT_INIT = 0;
-	JSlider attack;
-	JSlider defence;
-	JSlider dexterity;
-	JSlider vitality;
-	JSlider speed;
-	JSlider maxBreath;
-	JSlider[] statSliders = {attack, defence, dexterity, vitality, speed, maxBreath};
+	JSlider posX;
+	JSlider posY;
+	JSlider posZ;
+	JSlider rotX;
+	JSlider rotY;
+	JSlider rotZ;
+	JSlider scale;
+	JSlider[] statSliders = {posX, posY, posZ, rotX, rotY, rotZ, scale};
 	int[] stats = {0, 0, 0, 0, 0, 0};
-	String[] statNames = {"Attack", "Defence", "Dexterity", "Vitality", "Speed", "Max Breath"};
+	String[] statNames = {"X Pos", "Y Pos", "Z Pos", "Rotation X", "Rotation Y", "Rotation Z", "Scale"};
 	
 	String[] itemTypes = {"Staff", "Sword", "Shield", "OffHand", "Helmet", "Torso", "Legs", "Arms", "Hands", "Shoes", "Accessory"};
 	JComboBox<String> itemTypeBox;
@@ -163,7 +164,7 @@ public class Main extends JFrame{
 		
 		for(int i=0; i<statSliders.length; i++){
 			JLabel sliderLabel = new JLabel(statNames[i]+":");
-			sliderLabel.setBounds(650 + 10, 18 + (i*75), 300, 50);
+			sliderLabel.setBounds(950 + 10, 18 + (i*100), 300, 50);
 			add(sliderLabel);
 			
 			statSliders[i] = new JSlider(JSlider.HORIZONTAL,
@@ -174,11 +175,12 @@ public class Main extends JFrame{
 					changeValue((JSlider)e.getSource());
 				}
 			});
-			statSliders[i].setMajorTickSpacing(10);
+			statSliders[i].setMajorTickSpacing((STAT_MAX-STAT_MIN)/10);
 			statSliders[i].setMinorTickSpacing(2);
 			statSliders[i].setPaintTicks(true);
 			statSliders[i].setPaintLabels(true);
-			statSliders[i].setBounds(650, 50 + (i*75), 300, 50);
+			statSliders[i].setPaintTrack(false);
+			statSliders[i].setBounds(950, 50 + (i*100), 300, 50);
 			add(statSliders[i]);
 		}
 		

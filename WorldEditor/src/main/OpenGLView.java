@@ -32,8 +32,8 @@ import worldParser.WorldFileLoader;
 @SuppressWarnings("serial")
 public class OpenGLView extends Canvas{
 
-    private static final int WIDTH = 500;
-    private static final int HEIGHT = 300;
+    private static final int WIDTH = 900;
+    private static final int HEIGHT = 900 - 100 - 40 - 30;
     
     private Thread glThread;
     
@@ -46,7 +46,7 @@ public class OpenGLView extends Canvas{
         }
         setPreferredSize(new Dimension(WIDTH, HEIGHT));
         setIgnoreRepaint(true);
-        setBounds(25, Main.HEIGHT-(WIDTH*2/3)-25, WIDTH, HEIGHT);
+        setBounds(25, 40 + 30 + 25, WIDTH, HEIGHT);
     }
     
     public void setupWorld(){
