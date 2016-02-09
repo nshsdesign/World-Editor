@@ -8,12 +8,8 @@ import java.awt.event.KeyListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
 
-import javax.imageio.ImageIO;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
@@ -33,6 +29,9 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import org.apache.commons.io.FileUtils;
 
+import entities.World;
+import worldParser.WorldFileLoader;
+
 @SuppressWarnings("serial")
 public class Main extends JFrame{
 	
@@ -45,25 +44,15 @@ public class Main extends JFrame{
 	public static final String ITEM_FOLDER_LOC = "items/";
 
 	private String name = "NONAME";
-
-	private String objFile = "";
-	private String iconFile = "";
-	private String textureFile = "";
-
-	private JFileChooser objFC;
-	private JFileChooser iconFC;
-	private JFileChooser textureFC;
-
-	private JButton openOBJ;
-	private JButton openIcon;
-	private JButton openTexture;
+	private String worldFile = "";
 	
-	private JTextField objTF;
-	private JTextField iconTF;
-	private JTextField textureTF;
-	
+	private JFileChooser worldFC;
+	private JButton openWorld;
+	private JTextField worldTF;
 	private JTextField nameTF;
 	private JLabel nameLabel;
+	
+	private World world;
 	
 	public static final int STAT_MIN = -100;
 	public static final int STAT_MAX = 100;
@@ -78,32 +67,30 @@ public class Main extends JFrame{
 	JSlider[] statSliders = {posX, posY, posZ, rotX, rotY, rotZ, scale};
 	int[] stats = {0, 0, 0, 0, 0, 0};
 	String[] statNames = {"X Pos", "Y Pos", "Z Pos", "Rotation X", "Rotation Y", "Rotation Z", "Scale"};
-	
 	String[] itemTypes = {"Staff", "Sword", "Shield", "OffHand", "Helmet", "Torso", "Legs", "Arms", "Hands", "Shoes", "Accessory"};
-	JComboBox<String> itemTypeBox;
+	JComboBox<String> objectTypeBox;
 	JMenuBar menuBar;
 	JMenu file;
 	JMenuItem newF, open, save;
-	
 	JDialog saved;
 	
 	//***************//
 	
-	String currentItemType = itemTypes[0];
+	String currentObjectType = itemTypes[0];
 
 	public static void main(String[] args){
 		new Main();
 	}
 	
 	public Main(){
-		setTitle("Item Creator v1.0");
+		setTitle("World Editor v1.0");
 		add(new OpenGLView());
 		
 		//JComponent Stuff//
 		menuBar = new JMenuBar();
 		file = new JMenu("File");
 		file.getAccessibleContext().setAccessibleDescription(
-		        "Open files");
+		        "Open file");
 		menuBar.add(file);
 		newF = new JMenuItem("New", KeyEvent.VK_N);
 		file.add(newF);
@@ -125,19 +112,19 @@ public class Main extends JFrame{
 		file.add(save);
 		setJMenuBar(menuBar);
 		
-		itemTypeBox = new JComboBox<String>(itemTypes);
-		itemTypeBox.setSelectedIndex(0);
-		itemTypeBox.addActionListener(new ActionListener() {
+		objectTypeBox = new JComboBox<String>(itemTypes);
+		objectTypeBox.setSelectedIndex(0);
+		objectTypeBox.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-		        String newSelection = (String)itemTypeBox.getSelectedItem();
-		        currentItemType = newSelection;
+		        String newSelection = (String)objectTypeBox.getSelectedItem();
+		        currentObjectType = newSelection;
 			}
 		});
 		setLayout(null);
-		itemTypeBox.setBounds(20, 40, 200, 30);
-		add(itemTypeBox);
+		objectTypeBox.setBounds(20, 40, 200, 30);
+		add(objectTypeBox);
 		
-		nameLabel=new JLabel("Item name: ");
+		nameLabel=new JLabel("World name: ");
 		nameLabel.setBounds(275,40,100,30);
 		add(nameLabel);
 		
@@ -160,8 +147,6 @@ public class Main extends JFrame{
 		
 		//****//
 		
-		//TODO: Add Camera controls
-		
 		for(int i=0; i<statSliders.length; i++){
 			JLabel sliderLabel = new JLabel(statNames[i]+":");
 			sliderLabel.setBounds(950 + 10, 18 + (i*100), 300, 50);
@@ -183,14 +168,6 @@ public class Main extends JFrame{
 			statSliders[i].setBounds(950, 50 + (i*100), 300, 50);
 			add(statSliders[i]);
 		}
-		
-		/*timer = new Timer(1000, new ActionListener(){
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				//System.out.println(currentItemType + ", " + stats[0] + ", " + stats[1] + ", " + stats[2] + ", " + stats[3] + ", " + stats[4] + ", " + stats[5]);
-			}
-		});
-		timer.start();*/
 		
 		//*****************//
 		
@@ -217,6 +194,8 @@ public class Main extends JFrame{
 
 	public void saveAndExportFiles(){
 		String dataFileLoc = RES_LOC + ITEM_FOLDER_LOC + name + "/" + name.replaceAll("\\s+","") + ".dat";
+		
+		//Double check that file and folder exists
 	    File f = new File(dataFileLoc);
 	    f.getParentFile().mkdirs();
 	    try {
@@ -225,31 +204,16 @@ public class Main extends JFrame{
 			System.err.println("Could not make '.dat' file");
 		    System.exit(-1);
 		}
-	    //save .dat
-		PrintWriter writer = null;
-		try {
-			writer = new PrintWriter(dataFileLoc, "UTF-8");
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		}
-		String line = currentItemType +": "+ name +" "+ iconFile +" "+ objFile +" "+ 
-				textureFile +" "+ stats[0] +" "+ stats[1] +" "+ stats[2] +" "+ 
-				stats[3] +" "+ stats[4] +" "+ stats[5];
-		writer.println(line);
-		writer.close();
+	    
+	    //------- save -------
+	    WorldFileLoader.saveWorldFile(dataFileLoc, world);
 	    
 	    //copy files
 	    File dest = f.getParentFile();
-	    File objSource = new File(objFile);
-	    File iconSource = new File(iconFile);
-	    File textureSource = new File(textureFile);
+	    File worldSource = new File(worldFile);
 	    String message = "Finished Saving!";
 	    try {
-	    	FileUtils.copyFileToDirectory(objSource, dest);
-	    	FileUtils.copyFileToDirectory(iconSource, dest);
-	    	FileUtils.copyFileToDirectory(textureSource, dest);
+	    	FileUtils.copyFileToDirectory(worldSource, dest);
 	    } catch (IOException e) {
 	        message = "ERROR: Could not save as there are not enough source files";
 	        e.printStackTrace();
@@ -289,152 +253,54 @@ public class Main extends JFrame{
 	    JLabel OBJLoc = new JLabel(".OBJ File: ");
 	    OBJLoc.setBounds(100, 100, 100, 25);
 	    openPane.add(OBJLoc);
-	    objTF = new JTextField(20);
-	    objTF.setBounds(200, 100, 200, 25);
-	    objTF.addKeyListener(new KeyListener(){
+	    worldTF = new JTextField(20);
+	    worldTF.setBounds(200, 100, 200, 25);
+	    worldTF.addKeyListener(new KeyListener(){
 			@Override
 			public void keyPressed(KeyEvent e) {
 			}
 			@Override
 			public void keyReleased(KeyEvent e) {
-				objFile = ((JTextField)e.getSource()).getText();
+				worldFile = ((JTextField)e.getSource()).getText();
 			}
 			@Override
 			public void keyTyped(KeyEvent e) {
 			}
 	    });
-	    openPane.add(objTF);
+	    openPane.add(worldTF);
 	    
-	    JLabel iconLoc = new JLabel("Icon File: ");
-	    iconLoc.setBounds(100, 150, 100, 25);
-	    openPane.add(iconLoc);
-	    iconTF = new JTextField(20);
-	    iconTF.setBounds(200, 150, 200, 25);
-	    iconTF.addKeyListener(new KeyListener(){
-			@Override
-			public void keyPressed(KeyEvent e) {
-			}
-			@Override
-			public void keyReleased(KeyEvent e) {
-				iconFile = ((JTextField)e.getSource()).getText();
-			}
-			@Override
-			public void keyTyped(KeyEvent e) {
-			}
-	    });
-	    openPane.add(iconTF);
-	    
-	    JLabel textureLoc = new JLabel("Texture File: ");
-	    textureLoc.setBounds(100, 200, 100, 25);
-	    openPane.add(textureLoc);
-	    textureTF = new JTextField(20);
-	    textureTF.setBounds(200, 200, 200, 25);
-	    textureTF.addKeyListener(new KeyListener(){
-			@Override
-			public void keyPressed(KeyEvent e) {
-			}
-			@Override
-			public void keyReleased(KeyEvent e) {
-				textureFile = ((JTextField)e.getSource()).getText();
-			}
-			@Override
-			public void keyTyped(KeyEvent e) {
-			}
-	    });
-	    openPane.add(textureTF);
-	    
-	    
-	    objFC = new JFileChooser(".");
-	    iconFC = new JFileChooser(".");
-	    textureFC = new JFileChooser(".");
-	    FileFilter filter1 = new FileNameExtensionFilter("Obj File","obj");
-	    objFC.setFileFilter(filter1);
-	    FileFilter filter2 = new FileNameExtensionFilter("Image files", ImageIO.getReaderFileSuffixes());
-	    iconFC.setFileFilter(filter2);
-	    textureFC.setFileFilter(filter2);
-	    objFC.addPropertyChangeListener(new PropertyChangeListener(){
+	    worldFC = new JFileChooser(".");
+	    FileFilter filter1 = new FileNameExtensionFilter("World File","world");
+	    worldFC.setFileFilter(filter1);
+	    worldFC.addPropertyChangeListener(new PropertyChangeListener(){
 			@Override
 			public void propertyChange(PropertyChangeEvent e){
 				try{
 					//System.out.println(e.getPropertyName());
 					if(JFileChooser.SELECTED_FILE_CHANGED_PROPERTY.equalsIgnoreCase(e.getPropertyName())){
-						File file = objFC.getSelectedFile();
-						objFile= file.getCanonicalPath();
+						File file = worldFC.getSelectedFile();
+						worldFile= file.getCanonicalPath();
 						//System.out.println(e.getPropertyName());
-						objTF.setText(objFile);
-					}
-				}catch(Exception ex){}
-			}
-	    });
-	    iconFC.addPropertyChangeListener(new PropertyChangeListener(){
-			@Override
-			public void propertyChange(PropertyChangeEvent e) {
-				try{
-					if(JFileChooser.SELECTED_FILE_CHANGED_PROPERTY.equalsIgnoreCase(e.getPropertyName())){
-						File file = iconFC.getSelectedFile();
-						iconFile= file.getCanonicalPath();
-						iconTF.setText(iconFile);
-					}
-				}catch(Exception ex){}
-			}
-	    });
-	    textureFC.addPropertyChangeListener(new PropertyChangeListener(){
-			@Override
-			public void propertyChange(PropertyChangeEvent e) {
-				try{
-					if(JFileChooser.SELECTED_FILE_CHANGED_PROPERTY.equalsIgnoreCase(e.getPropertyName())){
-						File file = textureFC.getSelectedFile();
-						textureFile= file.getCanonicalPath();
-						textureTF.setText(textureFile);
+						worldTF.setText(worldFile);
 					}
 				}catch(Exception ex){}
 			}
 	    });
 	    
-	    
-	    openOBJ = new JButton("...");
-	    openOBJ.addActionListener(new ActionListener(){
+	    openWorld = new JButton("...");
+	    openWorld.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e) {
-		        int returnVal = objFC.showOpenDialog(Main.this);
+		        int returnVal = worldFC.showOpenDialog(Main.this);
 		        if (returnVal == JFileChooser.APPROVE_OPTION) {
-		            File file = objFC.getSelectedFile();
-		            objFile = RES_LOC + ITEM_FOLDER_LOC + name + "/" +file.getName();
+		            File file = worldFC.getSelectedFile();
+		            worldFile = RES_LOC + ITEM_FOLDER_LOC + name + "/" +file.getName();
 		        }	
 			}
 	    });
-	    openOBJ.setBounds(400, 100, 25, 25);
-	    openPane.add(openOBJ);
+	    openWorld.setBounds(400, 100, 25, 25);
+	    openPane.add(openWorld);
 	    
-	    
-	    openIcon = new JButton("...");
-	    openIcon.addActionListener(new ActionListener(){
-			@Override
-			public void actionPerformed(ActionEvent e) {
-		        int returnVal = iconFC.showOpenDialog(Main.this);
-		        if (returnVal == JFileChooser.APPROVE_OPTION) {
-		            File file = iconFC.getSelectedFile();
-		            iconFile = RES_LOC + ITEM_FOLDER_LOC + name + "/" +file.getName();
-		        }
-			}
-	    });
-	    openIcon.setBounds(400, 150, 25, 25);
-	    openPane.add(openIcon);
-	    
-	    
-	    openTexture = new JButton("...");
-	    openTexture.addActionListener(new ActionListener(){
-			@Override
-			public void actionPerformed(ActionEvent e) {
-		        int returnVal = textureFC.showOpenDialog(Main.this);
-		        if (returnVal == JFileChooser.APPROVE_OPTION) {
-		            File file = textureFC.getSelectedFile();
-		            textureFile = RES_LOC + ITEM_FOLDER_LOC + name + "/" +file.getName();
-		        }
-			}
-	    });
-	    openTexture.setBounds(400, 200, 25, 25);
-	    openPane.add(openTexture);
 	    
 	    
 	    openFrame.add(openPane);

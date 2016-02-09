@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,6 +14,7 @@ import org.lwjgl.util.vector.Vector3f;
 
 import entities.BoundingBox;
 import entities.Entity;
+import entities.World;
 import models.RawModel;
 import models.TexturedModel;
 import objConverter.OBJFileLoader;
@@ -71,11 +74,11 @@ public class WorldFileLoader {
 		} catch (IOException e) {
 			System.err.println("Error reading the file");
 		}
-	}	
+	}
 	
 	public static void loadObjectTypes(String objectsFileName){
 		FileReader isr = null;
-		File objFile = new File(RES_LOC + objectsFileName + ".world");
+		File objFile = new File(RES_LOC + objectsFileName + ".type");
 		try {
 			isr = new FileReader(objFile);
 		} catch (FileNotFoundException e) {
@@ -103,6 +106,26 @@ public class WorldFileLoader {
 		} catch (IOException e) {
 			System.err.println("Error reading the file");
 		}
+	}
+	
+	public static void saveWorldFile(String worldFileName, World world){
+		PrintWriter writer = null;
+		try {
+			writer = new PrintWriter(worldFileName, "UTF-8");
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
+		
+		//String line = "e "+currentObject+" "+posX+" "+posY+" "+posZ+" "+rotX+" "+rotY+" "+rotZ+" "+scale+" "+boxposX+" "+boxposY+" "+boxposZ+" "+boxsizeX+" "+boxsizeY+" "+boxsizeZ+" "+isStatic;
+
+		//writer.println(line);
+		writer.close();
+	}
+	
+	public static World getWorld(){
+		return new World(entities, objectTypes);
 	}
 	
 	public static List<TexturedModel> getObjectTypes(){
