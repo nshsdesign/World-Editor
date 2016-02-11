@@ -68,10 +68,10 @@ public class Loader {
 		return new RawModel(vaoID, positions.length / dimensions);
 	}
 
-	public int loadTexture(String fileName) {
+	public int loadTexture(String subfolder, String fileName) {
 		Texture texture = null;
 		try {
-			texture = TextureLoader.getTexture("PNG", new FileInputStream("res/" + fileName
+			texture = TextureLoader.getTexture("PNG", new FileInputStream("res/" + subfolder +"/"+ fileName
 					+ ".png"));
 			GL30.glGenerateMipmap(GL11.GL_TEXTURE_2D);
 			GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER,
@@ -98,13 +98,13 @@ public class Loader {
 		}
 	}
 
-	public int loadCubeMap(String[] textureFiles) {
+	public int loadCubeMap(String subfolder, String[] textureFiles) {
 		int texID = GL11.glGenTextures();
 		GL13.glActiveTexture(GL13.GL_TEXTURE0);
 		GL11.glBindTexture(GL13.GL_TEXTURE_CUBE_MAP, texID);
 
 		for (int i = 0; i < textureFiles.length; i++) {
-			TextureData data = decodeTextureFile("res/" + textureFiles[i] + ".png");
+			TextureData data = decodeTextureFile("res/" + subfolder +"/"+ textureFiles[i] + ".png");
 			GL11.glTexImage2D(GL13.GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL11.GL_RGBA, data.getWidth(), data.getHeight(), 0,
 					GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, data.getBuffer());
 		}

@@ -26,6 +26,7 @@ public class WorldFileLoader {
 	//e "model_file" "posX posY posZ" "rotX rotY rotZ" "scale" "boxposX boxposY boxposZ" " boxsizeX boxsizeY boxsizeZ" "isStatic"
 
 	private static final String RES_LOC = "res/";
+	private static final String SUBFOLDER = "textureFiles";
 	private static Loader loader;
 	private static List<Entity> entities;
 	private static List<TexturedModel> objectTypes;
@@ -45,7 +46,7 @@ public class WorldFileLoader {
 			line = reader.readLine();
 			while (line != null) {
 				if (line.startsWith("e ")) {
-					String[] currentLine = line.split(" ");
+					String[] currentLine = line.split("|");
 					String modelFile = currentLine[1];
 					Vector3f pos = new Vector3f((float) Float.valueOf(currentLine[2]),
 							(float) Float.valueOf(currentLine[3]),
@@ -62,7 +63,7 @@ public class WorldFileLoader {
 							(float) Float.valueOf(currentLine[14]));
 					
 					RawModel model = OBJFileLoader.loadOBJ(modelFile, loader);
-					ModelTexture tex = new ModelTexture(loader.loadTexture(modelFile));
+					ModelTexture tex = new ModelTexture(loader.loadTexture(SUBFOLDER, modelFile));
 					TexturedModel texModel = new TexturedModel(model, tex);
 					Entity e = new Entity(texModel, pos, rot, scale, new BoundingBox(boxPos, boxSize));
 					entities.add(e);
@@ -95,7 +96,7 @@ public class WorldFileLoader {
 					String modelFile = currentLine[1];
 					
 					RawModel model = OBJFileLoader.loadOBJ(modelFile, loader);
-					ModelTexture tex = new ModelTexture(loader.loadTexture(modelFile));
+					ModelTexture tex = new ModelTexture(loader.loadTexture(SUBFOLDER, modelFile));
 					TexturedModel texModel = new TexturedModel(model, tex);
 					objectTypes.add(texModel);
 

@@ -21,6 +21,7 @@ public class Terrain {
 	public static final float SIZE = 800;
 	private static final int MAX_HEIGHT = 40;
 	private static final int MAX_PIXEL_COLOR = 256 * 256 * 256;
+	private static final String SUBFOLDER = "terrain";
 
 	private float x;
 	private float z;
@@ -92,7 +93,7 @@ public class Terrain {
 	private RawModel generateTerrain(Loader loader, String heightMap) {
 		BufferedImage image = null;
 		try {
-			image = ImageIO.read(new File("res/" + heightMap + ".png"));
+			image = ImageIO.read(new File("res/" + SUBFOLDER +"/"+ heightMap + ".png"));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

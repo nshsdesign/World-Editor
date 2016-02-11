@@ -66,16 +66,16 @@ public class OpenGLView extends Canvas{
 		// Terrain Textures:
 
 		TerrainTexture backgroundTexture = new TerrainTexture(
-				loader.loadTexture("grassy3"));
-		TerrainTexture rTexture = new TerrainTexture(loader.loadTexture("dirt"));
+				loader.loadTexture("terrain", "grassy3"));
+		TerrainTexture rTexture = new TerrainTexture(loader.loadTexture("terrain", "dirt"));
 		TerrainTexture gTexture = new TerrainTexture(
-				loader.loadTexture("pinkFlowers"));
-		TerrainTexture bTexture = new TerrainTexture(loader.loadTexture("Cobblestone"));
+				loader.loadTexture("terrain", "pinkFlowers"));
+		TerrainTexture bTexture = new TerrainTexture(loader.loadTexture("terrain", "Cobblestone"));
 
 		TerrainTexturePack texturePack = new TerrainTexturePack(
 				backgroundTexture, rTexture, gTexture, bTexture);
 		TerrainTexture blendMap = new TerrainTexture(
-				loader.loadTexture("blendMap3"));		
+				loader.loadTexture("blendMaps", "blendMap3"));		
 
 		Terrain terrain = new Terrain(0, 0, loader, texturePack, blendMap,
 				"heightMap4");

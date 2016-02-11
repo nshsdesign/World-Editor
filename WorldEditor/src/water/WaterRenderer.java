@@ -22,6 +22,7 @@ public class WaterRenderer {
 	private static final String DUDV_MAP = "waterDUDV";
 	private static final String NORMAL_MAP = "normal";
 	private static final float WAVE_SPEED = 0.03f;
+	private static final String SUBFOLDER = "water";
 
 	private RawModel quad;
 	private WaterShader shader;
@@ -35,8 +36,8 @@ public class WaterRenderer {
 	public WaterRenderer(Loader loader, WaterShader shader, Matrix4f projectionMatrix, WaterFrameBuffers fbos) {
 		this.shader = shader;
 		this.fbos = fbos;
-		dudvTexture = loader.loadTexture(DUDV_MAP);
-		normalMap = loader.loadTexture(NORMAL_MAP);
+		dudvTexture = loader.loadTexture(SUBFOLDER, DUDV_MAP);
+		normalMap = loader.loadTexture(SUBFOLDER, NORMAL_MAP);
 		shader.start();
 		shader.connectTextureUnits();
 		shader.loadProjectionMatrix(projectionMatrix);

@@ -14,6 +14,7 @@ import renderEngine.Loader;
 public class SkyboxRenderer {
 	
 	private static final float SIZE = 1000f;
+	private static final String SUBFOLDER = "skybox";
 	
 	private static final float[] VERTICES = {        
 	    -SIZE,  SIZE, -SIZE,
@@ -70,8 +71,8 @@ public class SkyboxRenderer {
 	
 	public SkyboxRenderer(Loader loader, Matrix4f projectionMatrix){
 		cube = loader.loadToVAO(VERTICES, 3);
-		texture = loader.loadCubeMap(TEXTURE_FILES);
-		nightTexture = loader.loadCubeMap(NIGHT_TEXTURE_FILES);
+		texture = loader.loadCubeMap(SUBFOLDER, TEXTURE_FILES);
+		nightTexture = loader.loadCubeMap(SUBFOLDER, NIGHT_TEXTURE_FILES);
 		shader = new SkyboxShader();
 		shader.start();
 		shader.connectTextureUnits();
