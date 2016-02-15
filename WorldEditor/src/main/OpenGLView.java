@@ -6,15 +6,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.lwjgl.LWJGLException;
+import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
+import entities.BoundingBox;
 import entities.Camera;
 import entities.Entity;
 import entities.Light;
+import entities.World;
 import guis.GuiRenderer;
 import guis.GuiTexture;
 import renderEngine.DisplayManager;
@@ -23,6 +26,7 @@ import renderEngine.MasterRenderer;
 import terrains.Terrain;
 import textures.TerrainTexture;
 import textures.TerrainTexturePack;
+import toolbox.MousePicker;
 import water.WaterFrameBuffers;
 import water.WaterRenderer;
 import water.WaterShader;
@@ -36,8 +40,9 @@ public class OpenGLView extends Canvas{
     private static final int HEIGHT = 900 - 100 - 40 - 30;
     
     private Thread glThread;
+    private World world;
     
-    public OpenGLView(){
+    public OpenGLView(World world){
         try {
             Display.setParent(this);
         } catch (LWJGLException e) {
@@ -47,6 +52,8 @@ public class OpenGLView extends Canvas{
         setPreferredSize(new Dimension(WIDTH, HEIGHT));
         setIgnoreRepaint(true);
         setBounds(25, 40 + 30 + 25, WIDTH, HEIGHT);
+        
+        this.world = world;
     }
     
     public void setupWorld(){
@@ -99,10 +106,24 @@ public class OpenGLView extends Canvas{
 		
 		Camera camera = new Camera();
 
-		//MousePicker picker = new MousePicker(camera, renderer.getProjectionMatrix(), terrains);
+		MousePicker picker = new MousePicker(camera, renderer.getProjectionMatrix(), terrains.get(0));
+		Entity currentSelection = new Entity(loader, world.getCurrentObjectType(), new Vector3f(0,0,0), new Vector3f(0,0,0), Main.stats[6], new BoundingBox(new Vector3f(0,0,0),new Vector3f(0,0,0)));
+		entities.add(currentSelection);
 		
 		while (!Display.isCloseRequested()) {
+			if(currentSelection.getName() != world.getCurrentObjectType()){
+				currentSelection.setModel(loader, world.getCurrentObjectType());
+				System.out.println("different");
+			}
+			
+			currentSelection.setScale(Main.stats[6]);
+			
+			//TODO: make currentSelection the last placed object, and make add object and select object tools
+			
 			camera.move();
+			picker.update();
+			if(picker.getCurrentTerrainPoint() != null) currentSelection.setPosition(picker.getCurrentTerrainPoint());
+			if(Mouse.isButtonDown(0)) entities.add(new Entity(currentSelection));
 
 			GL11.glEnable(GL30.GL_CLIP_DISTANCE0);
 			

@@ -15,21 +15,17 @@ import org.lwjgl.util.vector.Vector3f;
 import entities.BoundingBox;
 import entities.Entity;
 import entities.World;
-import models.RawModel;
-import models.TexturedModel;
-import objConverter.OBJFileLoader;
 import renderEngine.Loader;
-import textures.ModelTexture;
 
 public class WorldFileLoader {
 	
 	//e "model_file" "posX posY posZ" "rotX rotY rotZ" "scale" "boxposX boxposY boxposZ" " boxsizeX boxsizeY boxsizeZ" "isStatic"
 
 	private static final String RES_LOC = "res/";
-	private static final String SUBFOLDER = "textureFiles";
+	private static final String SUBFOLDER = "worlds/";
 	private static Loader loader;
-	private static List<Entity> entities;
-	private static List<TexturedModel> objectTypes;
+	private static List<Entity> entities = new ArrayList<Entity>();
+	private static List<String> objectTypes = new ArrayList<String>();
 	
 	public static void loadWorldFile(String worldFileName) {
 		FileReader isr = null;
@@ -47,7 +43,7 @@ public class WorldFileLoader {
 			while (line != null) {
 				if (line.startsWith("e ")) {
 					String[] currentLine = line.split("|");
-					String modelFile = currentLine[1];
+					String name = currentLine[1];
 					Vector3f pos = new Vector3f((float) Float.valueOf(currentLine[2]),
 							(float) Float.valueOf(currentLine[3]),
 							(float) Float.valueOf(currentLine[4]));
@@ -62,10 +58,7 @@ public class WorldFileLoader {
 							(float) Float.valueOf(currentLine[13]),
 							(float) Float.valueOf(currentLine[14]));
 					
-					RawModel model = OBJFileLoader.loadOBJ(modelFile, loader);
-					ModelTexture tex = new ModelTexture(loader.loadTexture(SUBFOLDER, modelFile));
-					TexturedModel texModel = new TexturedModel(model, tex);
-					Entity e = new Entity(texModel, pos, rot, scale, new BoundingBox(boxPos, boxSize));
+					Entity e = new Entity(loader, name, pos, rot, scale, new BoundingBox(boxPos, boxSize));
 					entities.add(e);
 
 				}
@@ -79,7 +72,7 @@ public class WorldFileLoader {
 	
 	public static void loadObjectTypes(String objectsFileName){
 		FileReader isr = null;
-		File objFile = new File(RES_LOC + objectsFileName + ".type");
+		File objFile = new File(RES_LOC + SUBFOLDER + objectsFileName + ".type");
 		try {
 			isr = new FileReader(objFile);
 		} catch (FileNotFoundException e) {
@@ -93,12 +86,8 @@ public class WorldFileLoader {
 			while (line != null) {
 				if (line.startsWith("obj ")) {
 					String[] currentLine = line.split(" ");
-					String modelFile = currentLine[1];
-					
-					RawModel model = OBJFileLoader.loadOBJ(modelFile, loader);
-					ModelTexture tex = new ModelTexture(loader.loadTexture(SUBFOLDER, modelFile));
-					TexturedModel texModel = new TexturedModel(model, tex);
-					objectTypes.add(texModel);
+					String name = currentLine[1];
+					objectTypes.add(name);
 
 				}
 				line = reader.readLine();
@@ -118,10 +107,9 @@ public class WorldFileLoader {
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}
-		
-		//String line = "e "+currentObject+" "+posX+" "+posY+" "+posZ+" "+rotX+" "+rotY+" "+rotZ+" "+scale+" "+boxposX+" "+boxposY+" "+boxposZ+" "+boxsizeX+" "+boxsizeY+" "+boxsizeZ+" "+isStatic;
 
-		//writer.println(line);
+		for(int i=0; i<world.getEntityInfo().length; i++) writer.println(world.getEntityInfo()[i]);
+		
 		writer.close();
 	}
 	
@@ -129,7 +117,7 @@ public class WorldFileLoader {
 		return new World(entities, objectTypes);
 	}
 	
-	public static List<TexturedModel> getObjectTypes(){
+	public static List<String> getObjectTypes(){
 		return objectTypes;
 	}
 	
@@ -139,6 +127,16 @@ public class WorldFileLoader {
 	
 	public static void init(Loader l){
 		loader = l;
+	}
+
+	public static String[] getObjectTypesArray() {
+		String[] array = new String[objectTypes.size()];
+		int count = 0;
+		for(String s: objectTypes){
+			array[count] = s;
+			count++;
+		}
+		return array;
 	}
 	
 }

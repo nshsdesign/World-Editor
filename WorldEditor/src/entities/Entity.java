@@ -1,6 +1,10 @@
 package entities;
 
+import models.RawModel;
 import models.TexturedModel;
+import objConverter.OBJFileLoader;
+import renderEngine.Loader;
+import textures.ModelTexture;
 
 import org.lwjgl.util.vector.Vector3f;
 
@@ -11,40 +15,65 @@ public class Entity {
 	private float rotX, rotY, rotZ;
 	private float scale;
 	private BoundingBox hitbox;
+	private boolean isStatic;
+	private String name;
 	
 	private int textureIndex = 0;
 
-	public Entity(TexturedModel model, Vector3f position, float rotX, float rotY, float rotZ,
+	public Entity(Loader loader, String name, Vector3f position, float rotX, float rotY, float rotZ,
 			float scale) {
-		this.model = model;
+		this.name = name;
 		this.position = position;
 		this.rotX = rotX;
 		this.rotY = rotY;
 		this.rotZ = rotZ;
 		this.scale = scale;
+		
+		RawModel rawModel = OBJFileLoader.loadOBJ(name, loader);
+		ModelTexture tex = new ModelTexture(loader.loadTexture("textureFiles", name));
+		this.model = new TexturedModel(rawModel, tex);
 	}
 	
-	public Entity(TexturedModel model, int index, Vector3f position, float rotX, float rotY, float rotZ,
+	public Entity(Loader loader, String name, int index, Vector3f position, float rotX, float rotY, float rotZ,
 			float scale) {
+		this.name = name;
 		this.textureIndex = index;
-		this.model = model;
 		this.position = position;
 		this.rotX = rotX;
 		this.rotY = rotY;
 		this.rotZ = rotZ;
 		this.scale = scale;
+		
+		RawModel rawModel = OBJFileLoader.loadOBJ(name, loader);
+		ModelTexture tex = new ModelTexture(loader.loadTexture("textureFiles", name));
+		this.model = new TexturedModel(rawModel, tex);
 	}
 	
-	public Entity(TexturedModel model, Vector3f position, Vector3f rot, float scale, BoundingBox boundingBox) {
-		this.model = model;
+	public Entity(Loader loader, String name, Vector3f position, Vector3f rot, float scale, BoundingBox boundingBox) {
+		this.name = name;
 		this.position = position;
 		this.rotX = rot.x;
 		this.rotY = rot.y;
 		this.rotZ = rot.z;
 		this.scale = scale;
 		this.hitbox = boundingBox;
+		
+		RawModel rawModel = OBJFileLoader.loadOBJ(name, loader);
+		ModelTexture tex = new ModelTexture(loader.loadTexture("textureFiles", name));
+		this.model = new TexturedModel(rawModel, tex);
 	}
 	
+	public Entity(Entity e) {
+		this.name = e.getName();
+		this.position = e.getPosition();
+		this.rotX = e.getRotX();
+		this.rotY = e.getRotY();
+		this.rotZ = e.getRotZ();
+		this.scale = e.getScale();
+		this.hitbox = e.getHitbox();
+		this.model = e.getModel();
+	}
+
 	public float getTextureXOffset(){
 		int column = textureIndex%model.getTexture().getNumberOfRows();
 		return (float)column/(float)model.getTexture().getNumberOfRows();
@@ -113,6 +142,29 @@ public class Entity {
 
 	public void setScale(float scale) {
 		this.scale = scale;
+	}
+
+	public BoundingBox getHitbox() {
+		return hitbox;
+	}
+	
+	public boolean getIsStatic(){
+		return isStatic;
+	}
+
+	public String getName() {
+		return name;
+	}
+	
+	public void setName(String name){
+		this.name = name;
+	}
+
+	public void setModel(Loader loader, String name) {
+		RawModel rawModel = OBJFileLoader.loadOBJ(name, loader);
+		ModelTexture tex = new ModelTexture(loader.loadTexture("textureFiles", name));
+		this.model = new TexturedModel(rawModel, tex);
+		this.name = name;
 	}
 
 }

@@ -17,10 +17,11 @@ import renderEngine.Loader;
 public class OBJFileLoader {
 
 	private static final String RES_LOC = "res/";
+	private static final String SUBFOLDER = "objFiles/";
 
 	public static RawModel loadOBJ(String objFileName, Loader loader) {
 		FileReader isr = null;
-		File objFile = new File(RES_LOC + objFileName + ".obj");
+		File objFile = new File(RES_LOC + SUBFOLDER + objFileName + ".obj");
 		try {
 			isr = new FileReader(objFile);
 		} catch (FileNotFoundException e) {

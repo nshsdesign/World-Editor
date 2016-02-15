@@ -27,8 +27,6 @@ import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import org.apache.commons.io.FileUtils;
-
 import entities.World;
 import worldParser.WorldFileLoader;
 
@@ -41,7 +39,7 @@ public class Main extends JFrame{
 	//ALL JComponents//
 	
 	public static final String RES_LOC = "res/";
-	public static final String ITEM_FOLDER_LOC = "items/";
+	public static final String WORLD_FOLDER_LOC = "worlds/";
 
 	private String name = "NONAME";
 	private String worldFile = "";
@@ -65,9 +63,9 @@ public class Main extends JFrame{
 	JSlider rotZ;
 	JSlider scale;
 	JSlider[] statSliders = {posX, posY, posZ, rotX, rotY, rotZ, scale};
-	int[] stats = {0, 0, 0, 0, 0, 0};
+	public static int[] stats = {0, 0, 0, 0, 0, 0, 0};
 	String[] statNames = {"X Pos", "Y Pos", "Z Pos", "Rotation X", "Rotation Y", "Rotation Z", "Scale"};
-	String[] itemTypes = {"Staff", "Sword", "Shield", "OffHand", "Helmet", "Torso", "Legs", "Arms", "Hands", "Shoes", "Accessory"};
+	String[] objectTypes;
 	JComboBox<String> objectTypeBox;
 	JMenuBar menuBar;
 	JMenu file;
@@ -75,18 +73,23 @@ public class Main extends JFrame{
 	JDialog saved;
 	
 	//***************//
-	
-	String currentObjectType = itemTypes[0];
 
 	public static void main(String[] args){
 		new Main();
 	}
 	
 	public Main(){
-		setTitle("World Editor v1.0");
-		add(new OpenGLView());
+		world = new World();
 		
-		//JComponent Stuff//
+		setTitle("World Editor v1.0");
+		add(new OpenGLView(world));
+		
+		WorldFileLoader.loadObjectTypes("objectTypes");
+		objectTypes = WorldFileLoader.getObjectTypesArray();
+		System.out.println(objectTypes[0]);
+		world.setCurrentObjectType(objectTypes[0]);
+		 
+		//---------------JComponent Stuff--------------------//
 		menuBar = new JMenuBar();
 		file = new JMenu("File");
 		file.getAccessibleContext().setAccessibleDescription(
@@ -98,7 +101,7 @@ public class Main extends JFrame{
 		open.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				openFiles();
+				openFile();
 			}
 		});
 		file.add(open);
@@ -106,18 +109,18 @@ public class Main extends JFrame{
 		save.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				saveAndExportFiles();
+				saveAndExportFile();
 			}
 		});
 		file.add(save);
 		setJMenuBar(menuBar);
 		
-		objectTypeBox = new JComboBox<String>(itemTypes);
+		objectTypeBox = new JComboBox<String>(objectTypes);
 		objectTypeBox.setSelectedIndex(0);
 		objectTypeBox.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 		        String newSelection = (String)objectTypeBox.getSelectedItem();
-		        currentObjectType = newSelection;
+		        world.setCurrentObjectType(newSelection);
 			}
 		});
 		setLayout(null);
@@ -145,7 +148,7 @@ public class Main extends JFrame{
 	    });
 	    add(nameTF);
 		
-		//****//
+		//********************************************//
 		
 		for(int i=0; i<statSliders.length; i++){
 			JLabel sliderLabel = new JLabel(statNames[i]+":");
@@ -169,7 +172,7 @@ public class Main extends JFrame{
 			add(statSliders[i]);
 		}
 		
-		//*****************//
+		//********************************************//
 		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setResizable(false);
@@ -192,8 +195,8 @@ public class Main extends JFrame{
 
 	    //TODO: ADD AN INPUT FOR THE NAME OF THE ITEM
 
-	public void saveAndExportFiles(){
-		String dataFileLoc = RES_LOC + ITEM_FOLDER_LOC + name + "/" + name.replaceAll("\\s+","") + ".dat";
+	public void saveAndExportFile(){
+		String dataFileLoc = RES_LOC + WORLD_FOLDER_LOC + name + "/" + name.replaceAll("\\s+","") + ".world";
 		
 		//Double check that file and folder exists
 	    File f = new File(dataFileLoc);
@@ -201,24 +204,25 @@ public class Main extends JFrame{
 	    try {
 			f.createNewFile();
 		} catch (IOException e) {
-			System.err.println("Could not make '.dat' file");
+			System.err.println("Could not make '.world' file");
 		    System.exit(-1);
 		}
 	    
 	    //------- save -------
 	    WorldFileLoader.saveWorldFile(dataFileLoc, world);
 	    
-	    //copy files
-	    File dest = f.getParentFile();
-	    File worldSource = new File(worldFile);
-	    String message = "Finished Saving!";
-	    try {
-	    	FileUtils.copyFileToDirectory(worldSource, dest);
-	    } catch (IOException e) {
-	        message = "ERROR: Could not save as there are not enough source files";
-	        e.printStackTrace();
-	    }
-	    saved = new JDialog(this, message);
+//	    //copy files
+//	    File dest = f.getParentFile();
+//	    File worldSource = new File(worldFile);
+//	    String message = "Finished Saving!";
+//	    try {
+//	    	FileUtils.copyFileToDirectory(worldSource, dest);
+//	    } catch (IOException e) {
+//	        message = "ERROR: Could not save as there are not enough source files";
+//	        e.printStackTrace();
+//	    }
+	    
+	    saved = new JDialog(this, "Finished Saving!");
 	    saved.setSize(400, 200);
 	    saved.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 	    JPanel pane = new JPanel();
@@ -241,7 +245,7 @@ public class Main extends JFrame{
 		saved.dispose();
 	}
 
-	public void openFiles(){
+	public void openFile(){
 	    
 	    JFrame openFrame = new JFrame();
 	    JPanel openPane = new JPanel();
@@ -250,9 +254,9 @@ public class Main extends JFrame{
 
 	    
 	    
-	    JLabel OBJLoc = new JLabel(".OBJ File: ");
-	    OBJLoc.setBounds(100, 100, 100, 25);
-	    openPane.add(OBJLoc);
+	    JLabel worldLoc = new JLabel("World File: ");
+	    worldLoc.setBounds(100, 100, 100, 25);
+	    openPane.add(worldLoc);
 	    worldTF = new JTextField(20);
 	    worldTF.setBounds(200, 100, 200, 25);
 	    worldTF.addKeyListener(new KeyListener(){
@@ -294,7 +298,7 @@ public class Main extends JFrame{
 		        int returnVal = worldFC.showOpenDialog(Main.this);
 		        if (returnVal == JFileChooser.APPROVE_OPTION) {
 		            File file = worldFC.getSelectedFile();
-		            worldFile = RES_LOC + ITEM_FOLDER_LOC + name + "/" +file.getName();
+		            worldFile = RES_LOC + WORLD_FOLDER_LOC + name + "/" +file.getName();
 		        }	
 			}
 	    });
@@ -314,7 +318,7 @@ public class Main extends JFrame{
 
 	}
 
-	public void newFiles(){
+	public void newFile(){
 
 
 

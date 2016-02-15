@@ -13,7 +13,7 @@ import renderEngine.Loader;
 
 public class SkyboxRenderer {
 	
-	private static final float SIZE = 1000f;
+	private static final float SIZE = 2000f;
 	private static final String SUBFOLDER = "skybox";
 	
 	private static final float[] VERTICES = {        
@@ -116,6 +116,7 @@ public class SkyboxRenderer {
 			texture2 = texture;
 			blendFactor = (time - 21000)/(24000 - 21000);
 		}
+		blendFactor = 1f;
 
 		GL13.glActiveTexture(GL13.GL_TEXTURE0);
 		GL11.glBindTexture(GL13.GL_TEXTURE_CUBE_MAP, texture1);
