@@ -41,6 +41,11 @@ public class OpenGLView extends Canvas{
     
     private Thread glThread;
     private World world;
+    private boolean selectionPick = false;
+    private Entity currentSelection;
+    Loader loader;
+    
+    List<Entity> entities;
     
     public OpenGLView(World world){
         try {
@@ -58,13 +63,13 @@ public class OpenGLView extends Canvas{
     
     public void setupWorld(){
     	DisplayManager.createDisplay();
-		Loader loader = new Loader();
+		loader = new Loader();
 		WorldFileLoader.init(loader);
 		MasterRenderer renderer = new MasterRenderer(loader);
 		GuiRenderer guiRenderer = new GuiRenderer(loader);
 		
 		
-		List<Entity> entities = new ArrayList<Entity>();
+		entities = new ArrayList<Entity>();
 		List<Entity> normalMapEntities = new ArrayList<Entity>();
 		List<Light> lights = new ArrayList<Light>();
 		List<Terrain> terrains = new ArrayList<Terrain>();
@@ -107,8 +112,6 @@ public class OpenGLView extends Canvas{
 		Camera camera = new Camera();
 
 		MousePicker picker = new MousePicker(camera, renderer.getProjectionMatrix(), terrains.get(0));
-		Entity currentSelection = new Entity(loader, world.getCurrentObjectType(), new Vector3f(0,0,0), new Vector3f(0,0,0), Main.stats[6], new BoundingBox(new Vector3f(0,0,0),new Vector3f(0,0,0)));
-		entities.add(currentSelection);
 		
 		while (!Display.isCloseRequested()) {
 			if(currentSelection.getName() != world.getCurrentObjectType()){
@@ -122,8 +125,8 @@ public class OpenGLView extends Canvas{
 			
 			camera.move();
 			picker.update();
-			if(picker.getCurrentTerrainPoint() != null) currentSelection.setPosition(picker.getCurrentTerrainPoint());
-			if(Mouse.isButtonDown(0)) entities.add(new Entity(currentSelection));
+			if(picker.getCurrentTerrainPoint() != null && selectionPick) currentSelection.setPosition(picker.getCurrentTerrainPoint());
+			if(Mouse.isButtonDown(0)) selectionPick = false;
 
 			GL11.glEnable(GL30.GL_CLIP_DISTANCE0);
 			
@@ -186,5 +189,11 @@ public class OpenGLView extends Canvas{
             e.printStackTrace();
         }
     }
+
+	public void addNewObject() {
+		entities.remove(currentSelection);
+		new Entity(loader, world.getCurrentObjectType(), new Vector3f(0,0,0), new Vector3f(0,0,0), Main.stats[6], new BoundingBox(new Vector3f(0,0,0),new Vector3f(0,0,0)));
+		entities.add(currentSelection);
+	}
 	
 }

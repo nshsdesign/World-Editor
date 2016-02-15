@@ -71,6 +71,8 @@ public class Main extends JFrame{
 	JMenu file;
 	JMenuItem newF, open, save;
 	JDialog saved;
+	JButton addObject;
+	OpenGLView openGL;
 	
 	//***************//
 
@@ -80,16 +82,38 @@ public class Main extends JFrame{
 	
 	public Main(){
 		world = new World();
-		
+		openGL = new OpenGLView(world);
 		setTitle("World Editor v1.0");
-		add(new OpenGLView(world));
+		add(openGL);
 		
 		WorldFileLoader.loadObjectTypes("objectTypes");
 		objectTypes = WorldFileLoader.getObjectTypesArray();
 		System.out.println(objectTypes[0]);
 		world.setCurrentObjectType(objectTypes[0]);
-		 
-		//---------------JComponent Stuff--------------------//
+
+		setupJComponents();
+		
+		setupStatSliders();
+		
+		//********************************************//
+		
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setResizable(false);
+		setSize(WIDTH, HEIGHT);
+		setLocationRelativeTo(null);
+		setVisible(true);
+		
+	}
+	
+	private void setupJComponents(){
+		addObject = new JButton();
+		addObject.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e){
+				openGL.addNewObject();
+			}
+		});
+		
 		menuBar = new JMenuBar();
 		file = new JMenu("File");
 		file.getAccessibleContext().setAccessibleDescription(
@@ -147,9 +171,9 @@ public class Main extends JFrame{
 			}
 	    });
 	    add(nameTF);
-		
-		//********************************************//
-		
+	}
+	
+	private void setupStatSliders(){
 		for(int i=0; i<statSliders.length; i++){
 			JLabel sliderLabel = new JLabel(statNames[i]+":");
 			sliderLabel.setBounds(950 + 10, 18 + (i*100), 300, 50);
@@ -171,31 +195,17 @@ public class Main extends JFrame{
 			statSliders[i].setBounds(950, 50 + (i*100), 300, 50);
 			add(statSliders[i]);
 		}
-		
-		//********************************************//
-		
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setResizable(false);
-		setSize(WIDTH, HEIGHT);
-		setLocationRelativeTo(null);
-		setVisible(true);
-		
 	}
 		
-	public void changeValue(JSlider slider){
+	private void changeValue(JSlider slider){
 		for(int i=0; i<statSliders.length; i++){
 			if(slider.equals(statSliders[i])) stats[i] = slider.getValue();
 		}
 	}
 	
-	
-	
-	
-
-
 	    //TODO: ADD AN INPUT FOR THE NAME OF THE ITEM
 
-	public void saveAndExportFile(){
+	private void saveAndExportFile(){
 		String dataFileLoc = RES_LOC + WORLD_FOLDER_LOC + name + "/" + name.replaceAll("\\s+","") + ".world";
 		
 		//Double check that file and folder exists
@@ -240,12 +250,12 @@ public class Main extends JFrame{
 	    
 	}
 	
-	public void closeWindow(){
+	private void closeWindow(){
 		saved.setVisible(false);
 		saved.dispose();
 	}
 
-	public void openFile(){
+	private void openFile(){
 	    
 	    JFrame openFrame = new JFrame();
 	    JPanel openPane = new JPanel();
@@ -318,7 +328,7 @@ public class Main extends JFrame{
 
 	}
 
-	public void newFile(){
+	private void newFile(){
 
 
 
