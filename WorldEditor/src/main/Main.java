@@ -52,9 +52,9 @@ public class Main extends JFrame{
 	
 	private World world;
 	
-	public static final int STAT_MIN = -100;
-	public static final int STAT_MAX = 100;
-	public static final int STAT_INIT = 0;
+	public final int[] STAT_MIN = {-1000,-1000,-1000,-180,-180,-180,1};
+	public final int[] STAT_MAX = {1000,1000,1000,180,180,180,100};
+	public final int[] STAT_INIT = {0,0,0,0,0,0,1};
 	JSlider posX;
 	JSlider posY;
 	JSlider posZ;
@@ -63,7 +63,7 @@ public class Main extends JFrame{
 	JSlider rotZ;
 	JSlider scale;
 	JSlider[] statSliders = {posX, posY, posZ, rotX, rotY, rotZ, scale};
-	public static int[] stats = {0, 0, 0, 0, 0, 0, 0};
+	public static float[] stats = {0, 0, 0, 0, 0, 0, 0};
 	String[] statNames = {"X Pos", "Y Pos", "Z Pos", "Rotation X", "Rotation Y", "Rotation Z", "Scale"};
 	String[] objectTypes;
 	JComboBox<String> objectTypeBox;
@@ -88,9 +88,8 @@ public class Main extends JFrame{
 		
 		WorldFileLoader.loadObjectTypes("objectTypes");
 		objectTypes = WorldFileLoader.getObjectTypesArray();
-		System.out.println(objectTypes[0]);
 		world.setCurrentObjectType(objectTypes[0]);
-
+		
 		setupJComponents();
 		
 		setupStatSliders();
@@ -110,9 +109,12 @@ public class Main extends JFrame{
 		addObject.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e){
-				openGL.addNewObject();
+				OpenGLView.addNewObject();
 			}
 		});
+		addObject.setBounds(650, 30, 200, 40);
+		addObject.setText("Add Object");
+		add(addObject);
 		
 		menuBar = new JMenuBar();
 		file = new JMenu("File");
@@ -180,14 +182,14 @@ public class Main extends JFrame{
 			add(sliderLabel);
 			
 			statSliders[i] = new JSlider(JSlider.HORIZONTAL,
-	                STAT_MIN, STAT_MAX, STAT_INIT);
+	                STAT_MIN[i], STAT_MAX[i], STAT_INIT[i]);
 			statSliders[i].addChangeListener(new ChangeListener(){
 				@Override
 				public void stateChanged(ChangeEvent e) {
 					changeValue((JSlider)e.getSource());
 				}
 			});
-			statSliders[i].setMajorTickSpacing((STAT_MAX-STAT_MIN)/10);
+			statSliders[i].setMajorTickSpacing((STAT_MAX[i]-STAT_MIN[i])/10);
 			statSliders[i].setMinorTickSpacing(2);
 			statSliders[i].setPaintTicks(true);
 			statSliders[i].setPaintLabels(true);
@@ -328,10 +330,10 @@ public class Main extends JFrame{
 
 	}
 
-	private void newFile(){
-
-
-
-	}	
-	
+//	private void newFile(){
+//
+//
+//
+//	}	
+//	
 }

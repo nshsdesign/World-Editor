@@ -6,3 +6,8 @@
 /shaders/
 /normalMappingRenderer/
 /objConverter/
+/normalMappingObjConverter/
+/terrains/
+/textures/
+/toolbox/
+/water/

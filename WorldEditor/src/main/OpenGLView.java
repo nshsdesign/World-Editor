@@ -41,9 +41,12 @@ public class OpenGLView extends Canvas{
     
     private Thread glThread;
     private World world;
-    private boolean selectionPick = false;
+    private static boolean selectionPick = false;
     private Entity currentSelection;
     Loader loader;
+    private static boolean createNew;
+    
+    private Vector3f basePosition;
     
     List<Entity> entities;
     
@@ -112,21 +115,46 @@ public class OpenGLView extends Canvas{
 		Camera camera = new Camera();
 
 		MousePicker picker = new MousePicker(camera, renderer.getProjectionMatrix(), terrains.get(0));
-		
+				
 		while (!Display.isCloseRequested()) {
-			if(currentSelection.getName() != world.getCurrentObjectType()){
-				currentSelection.setModel(loader, world.getCurrentObjectType());
-				System.out.println("different");
-			}
-			
-			currentSelection.setScale(Main.stats[6]);
+
 			
 			//TODO: make currentSelection the last placed object, and make add object and select object tools
 			
 			camera.move();
 			picker.update();
-			if(picker.getCurrentTerrainPoint() != null && selectionPick) currentSelection.setPosition(picker.getCurrentTerrainPoint());
-			if(Mouse.isButtonDown(0)) selectionPick = false;
+			
+			if(createNew){
+				if(entities.contains(currentSelection)){
+					entities.add(new Entity(currentSelection));
+					entities.remove(currentSelection);
+				}
+				currentSelection = new Entity(loader, world.getCurrentObjectType(), new Vector3f(0,0,0), new Vector3f(0,0,0), Main.stats[6], new BoundingBox(new Vector3f(0,0,0),new Vector3f(0,0,0)));
+				entities.add(currentSelection);
+				createNew = false;
+			}
+			
+			if(currentSelection != null){
+				if(currentSelection.getName() != world.getCurrentObjectType()){
+					currentSelection.setModel(loader, world.getCurrentObjectType());
+				}
+				
+				if(picker.getCurrentTerrainPoint() != null && selectionPick){
+					currentSelection.setPosition(picker.getCurrentTerrainPoint());
+					if(Mouse.isButtonDown(0)) selectionPick = false;
+					basePosition = currentSelection.getPosition();
+				}
+				if(basePosition == null){
+					basePosition = new Vector3f(0,0,0);
+				}
+				
+				//set stats equal to sliders
+				currentSelection.setPosition(new Vector3f(basePosition.x + Main.stats[0],basePosition.y + Main.stats[1],basePosition.z + Main.stats[2]));
+				currentSelection.setRotX(Main.stats[3]);
+				currentSelection.setRotY(Main.stats[4]);
+				currentSelection.setRotZ(Main.stats[5]);
+				currentSelection.setScale(Main.stats[6]);
+			}
 
 			GL11.glEnable(GL30.GL_CLIP_DISTANCE0);
 			
@@ -190,10 +218,12 @@ public class OpenGLView extends Canvas{
         }
     }
 
-	public void addNewObject() {
-		entities.remove(currentSelection);
-		new Entity(loader, world.getCurrentObjectType(), new Vector3f(0,0,0), new Vector3f(0,0,0), Main.stats[6], new BoundingBox(new Vector3f(0,0,0),new Vector3f(0,0,0)));
-		entities.add(currentSelection);
+	public static void addNewObject() {
+		createNew = true;
+		selectionPick = true;
+//		if(entities.contains(currentSelection)) entities.remove(currentSelection);
+//		currentSelection = new Entity(loader, world.getCurrentObjectType(), new Vector3f(0,0,0), new Vector3f(0,0,0), Main.stats[6], new BoundingBox(new Vector3f(0,0,0),new Vector3f(0,0,0)));
+//		entities.add(currentSelection);
 	}
 	
 }
