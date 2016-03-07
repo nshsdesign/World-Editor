@@ -115,6 +115,10 @@ public class OpenGLView extends Canvas{
 		Camera camera = new Camera();
 
 		MousePicker picker = new MousePicker(camera, renderer.getProjectionMatrix(), terrains.get(0));
+		
+		//TEMP
+		//Entity temp = new Entity(loader, "virus", new Vector3f(50, 40, 50), new Vector3f(0,0,0), 10, new BoundingBox(new Vector3f(0,0,0), new Vector3f(0,0,0)));
+		//entities.add(temp);
 				
 		while (!Display.isCloseRequested()) {
 
@@ -123,6 +127,7 @@ public class OpenGLView extends Canvas{
 			
 			camera.move();
 			picker.update();
+			//temp.setRotY(temp.getRotY()+1);
 			
 			if(createNew){
 				if(entities.contains(currentSelection)){

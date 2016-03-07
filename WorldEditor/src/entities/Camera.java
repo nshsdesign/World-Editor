@@ -17,23 +17,19 @@ public class Camera {
 	private float pitch;
 	private float yaw;
 	private float roll;
-	private float mouseWheelSensitivity;
-	private float zoomDistance;
 	private float dx;
 	private float dz;
 	
 	//FreeRoam
 	private static final float ANGLE_MOVE_SPEED = 50;
-	private static final float MOVE_SPEED = ANGLE_MOVE_SPEED;
+	private static final float MOVE_SPEED = 50;
 	
 	public Camera(){
 		position = new Vector3f(0,10,0);
 		
 		dx = 0;
 		dz = 0;
-		mouseWheelSensitivity = 0.1f;
 		Mouse.setGrabbed(false);
-		zoomDistance = 50;
 		pitch = 10;
 		yaw = 135;
 	}
@@ -42,12 +38,13 @@ public class Camera {
         speed = MOVE_SPEED * DisplayManager.getFrameTimeSeconds();
         angleSpeed = ANGLE_MOVE_SPEED * DisplayManager.getFrameTimeSeconds();
         handleInputs();
-        calculateZoom();
-        position.y = zoomDistance;
     
 	}
 	
 	private void handleInputs(){
+		if(Keyboard.isKeyDown(Keyboard.KEY_LCONTROL)){
+			speed *=4;
+		}
 		if(Keyboard.isKeyDown(Keyboard.KEY_W)){
 			dz = (float) (-speed * Math.cos(Math.toRadians(yaw)));
 			dx = (float) (speed * Math.sin(Math.toRadians(yaw)));
@@ -84,6 +81,13 @@ public class Camera {
 		if(Keyboard.isKeyDown(Keyboard.KEY_F)){
 			pitch += angleSpeed;
 		}
+		if(Keyboard.isKeyDown(Keyboard.KEY_LSHIFT)){
+			position.y -= speed;
+		}
+		if(Keyboard.isKeyDown(Keyboard.KEY_SPACE)){
+			position.y += speed;
+		}
+
 	}
 	
 	public void invertPitch(){
@@ -104,11 +108,6 @@ public class Camera {
 
 	public float getRoll() {
 		return roll;
-	}
-	
-	private void calculateZoom(){
-		float zoomLevel = Mouse.getDWheel() * mouseWheelSensitivity;
-		if(zoomDistance-zoomLevel>=MIN_ZOOM && zoomDistance-zoomLevel<=MAX_ZOOM)zoomDistance -= zoomLevel;
 	}
 	
 }
