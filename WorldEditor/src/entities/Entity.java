@@ -1,12 +1,13 @@
 package entities;
 
+import org.lwjgl.util.vector.Vector3f;
+
 import models.RawModel;
 import models.TexturedModel;
 import objConverter.OBJFileLoader;
+import picking.AABB;
 import renderEngine.Loader;
 import textures.ModelTexture;
-
-import org.lwjgl.util.vector.Vector3f;
 
 public class Entity {
 
@@ -17,23 +18,22 @@ public class Entity {
 	private BoundingBox hitbox;
 	private boolean isStatic;
 	private String name;
-	
+
 	private int textureIndex = 0;
 
-	public Entity(Loader loader, String name, Vector3f position, float rotX, float rotY, float rotZ,
-			float scale) {
+	public Entity(Loader loader, String name, Vector3f position, float rotX, float rotY, float rotZ, float scale) {
 		this.name = name;
 		this.position = position;
 		this.rotX = rotX;
 		this.rotY = rotY;
 		this.rotZ = rotZ;
 		this.scale = scale;
-		
+
 		RawModel rawModel = OBJFileLoader.loadOBJ(name, loader);
 		ModelTexture tex = new ModelTexture(loader.loadTexture("textureFiles", name));
 		this.model = new TexturedModel(rawModel, tex);
 	}
-	
+
 	public Entity(Loader loader, String name, int index, Vector3f position, float rotX, float rotY, float rotZ,
 			float scale) {
 		this.name = name;
@@ -43,12 +43,12 @@ public class Entity {
 		this.rotY = rotY;
 		this.rotZ = rotZ;
 		this.scale = scale;
-		
+
 		RawModel rawModel = OBJFileLoader.loadOBJ(name, loader);
 		ModelTexture tex = new ModelTexture(loader.loadTexture("textureFiles", name));
 		this.model = new TexturedModel(rawModel, tex);
 	}
-	
+
 	public Entity(Loader loader, String name, Vector3f position, Vector3f rot, float scale, BoundingBox boundingBox) {
 		this.name = name;
 		this.position = position;
@@ -57,12 +57,12 @@ public class Entity {
 		this.rotZ = rot.z;
 		this.scale = scale;
 		this.hitbox = boundingBox;
-		
+
 		RawModel rawModel = OBJFileLoader.loadOBJ(name, loader);
 		ModelTexture tex = new ModelTexture(loader.loadTexture("textureFiles", name));
 		this.model = new TexturedModel(rawModel, tex);
 	}
-	
+
 	public Entity(Entity e) {
 		this.name = e.getName();
 		this.position = e.getPosition();
@@ -74,14 +74,14 @@ public class Entity {
 		this.model = e.getModel();
 	}
 
-	public float getTextureXOffset(){
-		int column = textureIndex%model.getTexture().getNumberOfRows();
-		return (float)column/(float)model.getTexture().getNumberOfRows();
+	public float getTextureXOffset() {
+		int column = textureIndex % model.getTexture().getNumberOfRows();
+		return (float) column / (float) model.getTexture().getNumberOfRows();
 	}
-	
-	public float getTextureYOffset(){
-		int row = textureIndex/model.getTexture().getNumberOfRows();
-		return (float)row/(float)model.getTexture().getNumberOfRows();
+
+	public float getTextureYOffset() {
+		int row = textureIndex / model.getTexture().getNumberOfRows();
+		return (float) row / (float) model.getTexture().getNumberOfRows();
 	}
 
 	public void increasePosition(float dx, float dy, float dz) {
@@ -147,16 +147,16 @@ public class Entity {
 	public BoundingBox getHitbox() {
 		return hitbox;
 	}
-	
-	public boolean getIsStatic(){
+
+	public boolean getIsStatic() {
 		return isStatic;
 	}
 
 	public String getName() {
 		return name;
 	}
-	
-	public void setName(String name){
+
+	public void setName(String name) {
 		this.name = name;
 	}
 
@@ -165,6 +165,10 @@ public class Entity {
 		ModelTexture tex = new ModelTexture(loader.loadTexture("textureFiles", name));
 		this.model = new TexturedModel(rawModel, tex);
 		this.name = name;
+	}
+
+	public AABB getAABB() {
+		return null;
 	}
 
 }

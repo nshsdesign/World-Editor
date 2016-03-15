@@ -1,0 +1,11 @@
+#version 330
+
+out vec3 out_colour;
+
+in vec2 pass_colour;
+
+void main(void){
+
+	out_colour = vec3(pass_colour, 0.0);
+	
+}

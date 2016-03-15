@@ -37,7 +37,7 @@ public class MasterRenderer {
 
 	private TerrainRenderer terrainRenderer;
 	private TerrainShader terrainShader = new TerrainShader();
-	
+
 	private NormalMappingRenderer normalMapRenderer;
 
 	private SkyboxRenderer skyboxRenderer;
@@ -55,19 +55,19 @@ public class MasterRenderer {
 		normalMapRenderer = new NormalMappingRenderer(projectionMatrix);
 	}
 
-	public Matrix4f getProjectionMatrix() {
+	public static Matrix4f getProjectionMatrix() {
 		return this.projectionMatrix;
 	}
 
-	public void renderScene(List<Entity> entities, List<Entity> normalEntities, List<Terrain> terrains, List<Light> lights,
-			Camera camera, Vector4f clipPlane) {
+	public void renderScene(List<Entity> entities, List<Entity> normalEntities, List<Terrain> terrains,
+			List<Light> lights, Camera camera, Vector4f clipPlane) {
 		for (Terrain terrain : terrains) {
 			processTerrain(terrain);
 		}
 		for (Entity entity : entities) {
 			processEntity(entity);
 		}
-		for(Entity entity : normalEntities){
+		for (Entity entity : normalEntities) {
 			processNormalMapEntity(entity);
 		}
 		render(lights, camera, clipPlane);
@@ -120,7 +120,7 @@ public class MasterRenderer {
 			entities.put(entityModel, newBatch);
 		}
 	}
-	
+
 	public void processNormalMapEntity(Entity entity) {
 		TexturedModel entityModel = entity.getModel();
 		List<Entity> batch = normalMapEntities.get(entityModel);

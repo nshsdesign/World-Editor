@@ -31,8 +31,7 @@ public class TerrainRenderer {
 		for (Terrain terrain : terrains) {
 			prepareTerrain(terrain);
 			loadModelMatrix(terrain);
-			GL11.glDrawElements(GL11.GL_TRIANGLES, terrain.getModel().getVertexCount(),
-					GL11.GL_UNSIGNED_INT, 0);
+			GL11.glDrawElements(GL11.GL_TRIANGLES, terrain.getModel().getVertexCount(), GL11.GL_UNSIGNED_INT, 0);
 			unbindTexturedModel();
 		}
 	}
@@ -46,8 +45,8 @@ public class TerrainRenderer {
 		bindTextures(terrain);
 		shader.loadShineVariables(1, 0);
 	}
-	
-	private void bindTextures(Terrain terrain){
+
+	private void bindTextures(Terrain terrain) {
 		TerrainTexturePack texturePack = terrain.getTexturePack();
 		GL13.glActiveTexture(GL13.GL_TEXTURE0);
 		GL11.glBindTexture(GL11.GL_TEXTURE_2D, texturePack.getBackgroundTexture().getTextureID());
@@ -69,8 +68,8 @@ public class TerrainRenderer {
 	}
 
 	private void loadModelMatrix(Terrain terrain) {
-		Matrix4f transformationMatrix = Maths.createTransformationMatrix(
-				new Vector3f(terrain.getX(), 0, terrain.getZ()), 0, 0, 0, 1);
+		Matrix4f transformationMatrix = Maths
+				.createTransformationMatrix(new Vector3f(terrain.getX(), 0, terrain.getZ()), 0, 0, 0, 1);
 		shader.loadTransformationMatrix(transformationMatrix);
 	}
 

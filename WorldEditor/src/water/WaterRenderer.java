@@ -2,8 +2,6 @@ package water;
 
 import java.util.List;
 
-import models.RawModel;
-
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
@@ -11,14 +9,15 @@ import org.lwjgl.opengl.GL30;
 import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector3f;
 
+import entities.Camera;
+import entities.Light;
+import models.RawModel;
 import renderEngine.DisplayManager;
 import renderEngine.Loader;
 import toolbox.Maths;
-import entities.Camera;
-import entities.Light;
 
 public class WaterRenderer {
-	
+
 	private static final String DUDV_MAP = "waterDUDV";
 	private static final String NORMAL_MAP = "normal";
 	private static final float WAVE_SPEED = 0.03f;
@@ -27,9 +26,9 @@ public class WaterRenderer {
 	private RawModel quad;
 	private WaterShader shader;
 	private WaterFrameBuffers fbos;
-	
+
 	private float moveFactor = 0;
-	
+
 	private int dudvTexture;
 	private int normalMap;
 
@@ -46,18 +45,17 @@ public class WaterRenderer {
 	}
 
 	public void render(List<WaterTile> water, Camera camera, Light sun) {
-		prepareRender(camera, sun);	
+		prepareRender(camera, sun);
 		for (WaterTile tile : water) {
 			Matrix4f modelMatrix = Maths.createTransformationMatrix(
-					new Vector3f(tile.getX(), tile.getHeight(), tile.getZ()), 0, 0, 0,
-					WaterTile.TILE_SIZE);
+					new Vector3f(tile.getX(), tile.getHeight(), tile.getZ()), 0, 0, 0, WaterTile.TILE_SIZE);
 			shader.loadModelMatrix(modelMatrix);
 			GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, quad.getVertexCount());
 		}
 		unbind();
 	}
-	
-	private void prepareRender(Camera camera, Light sun){
+
+	private void prepareRender(Camera camera, Light sun) {
 		shader.start();
 		shader.loadViewMatrix(camera);
 		moveFactor += WAVE_SPEED * DisplayManager.getFrameTimeSeconds();
@@ -79,8 +77,8 @@ public class WaterRenderer {
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 	}
-	
-	private void unbind(){
+
+	private void unbind() {
 		GL20.glDisableVertexAttribArray(0);
 		GL30.glBindVertexArray(0);
 		GL11.glDisable(GL11.GL_BLEND);

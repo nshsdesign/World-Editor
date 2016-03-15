@@ -1,22 +1,22 @@
 package textures;
 
 public class ModelTexture {
-	
+
 	private int textureID;
 	private int normalMap;
-	
+
 	private float shineDamper = 1;
 	private float reflectivity = 0;
-	
+
 	private boolean hasTransparency = false;
 	private boolean useFakeLighting = false;
-	
+
 	private int numberOfRows = 1;
-	
-	public ModelTexture(int texture){
+
+	public ModelTexture(int texture) {
 		this.textureID = texture;
 	}
-		
+
 	public int getNumberOfRows() {
 		return numberOfRows;
 	}
@@ -41,7 +41,6 @@ public class ModelTexture {
 		return useFakeLighting;
 	}
 
-
 	public void setUseFakeLighting(boolean useFakeLighting) {
 		this.useFakeLighting = useFakeLighting;
 	}
@@ -50,8 +49,7 @@ public class ModelTexture {
 		this.hasTransparency = hasTransparency;
 	}
 
-
-	public int getID(){
+	public int getID() {
 		return textureID;
 	}
 

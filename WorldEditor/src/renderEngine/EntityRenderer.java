@@ -20,7 +20,7 @@ public class EntityRenderer {
 
 	private StaticShader shader;
 
-	public EntityRenderer(StaticShader shader,Matrix4f projectionMatrix) {
+	public EntityRenderer(StaticShader shader, Matrix4f projectionMatrix) {
 		this.shader = shader;
 		shader.start();
 		shader.loadProjectionMatrix(projectionMatrix);
@@ -33,8 +33,7 @@ public class EntityRenderer {
 			List<Entity> batch = entities.get(model);
 			for (Entity entity : batch) {
 				prepareInstance(entity);
-				GL11.glDrawElements(GL11.GL_TRIANGLES, model.getRawModel().getVertexCount(),
-						GL11.GL_UNSIGNED_INT, 0);
+				GL11.glDrawElements(GL11.GL_TRIANGLES, model.getRawModel().getVertexCount(), GL11.GL_UNSIGNED_INT, 0);
 			}
 			unbindTexturedModel();
 		}
@@ -48,7 +47,7 @@ public class EntityRenderer {
 		GL20.glEnableVertexAttribArray(2);
 		ModelTexture texture = model.getTexture();
 		shader.loadNumberOfRows(texture.getNumberOfRows());
-		if(texture.isHasTransparency()){
+		if (texture.isHasTransparency()) {
 			MasterRenderer.disableCulling();
 		}
 		shader.loadFakeLightingVariable(texture.isUseFakeLighting());
@@ -66,8 +65,8 @@ public class EntityRenderer {
 	}
 
 	private void prepareInstance(Entity entity) {
-		Matrix4f transformationMatrix = Maths.createTransformationMatrix(entity.getPosition(),
-				entity.getRotX(), entity.getRotY(), entity.getRotZ(), entity.getScale());
+		Matrix4f transformationMatrix = Maths.createTransformationMatrix(entity.getPosition(), entity.getRotX(),
+				entity.getRotY(), entity.getRotZ(), entity.getScale());
 		shader.loadTransformationMatrix(transformationMatrix);
 		shader.loadOffset(entity.getTextureXOffset(), entity.getTextureYOffset());
 	}

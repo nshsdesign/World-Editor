@@ -1,0 +1,15 @@
+#version 330
+
+layout(location = 0) in vec3 in_position;
+layout(location = 1) in mat4 in_mvpMatrix;
+layout(location = 5) in vec2 in_colour;
+
+out vec2 pass_colour;
+
+
+void main(void){
+
+	gl_Position = in_mvpMatrix * vec4(in_position, 1.0);
+	pass_colour = in_colour;
+
+}

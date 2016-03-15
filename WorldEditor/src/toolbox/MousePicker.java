@@ -20,7 +20,7 @@ public class MousePicker {
 	private Matrix4f projectionMatrix;
 	private Matrix4f viewMatrix;
 	private Camera camera;
-	
+
 	private Terrain terrain;
 	private Vector3f currentTerrainPoint;
 
@@ -30,7 +30,7 @@ public class MousePicker {
 		viewMatrix = Maths.createViewMatrix(camera);
 		this.terrain = terrain;
 	}
-	
+
 	public Vector3f getCurrentTerrainPoint() {
 		return currentTerrainPoint;
 	}
@@ -78,16 +78,16 @@ public class MousePicker {
 		float y = (2.0f * mouseY) / Display.getHeight() - 1f;
 		return new Vector2f(x, y);
 	}
-	
-	//**********************************************************
-	
+
+	// **********************************************************
+
 	private Vector3f getPointOnRay(Vector3f ray, float distance) {
 		Vector3f camPos = camera.getPosition();
 		Vector3f start = new Vector3f(camPos.x, camPos.y, camPos.z);
 		Vector3f scaledRay = new Vector3f(ray.x * distance, ray.y * distance, ray.z * distance);
 		return Vector3f.add(start, scaledRay, null);
 	}
-	
+
 	private Vector3f binarySearch(int count, float start, float finish, Vector3f ray) {
 		float half = start + ((finish - start) / 2f);
 		if (count >= RECURSION_COUNT) {

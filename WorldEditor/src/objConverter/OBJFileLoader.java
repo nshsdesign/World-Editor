@@ -39,8 +39,7 @@ public class OBJFileLoader {
 				if (line.startsWith("v ")) {
 					String[] currentLine = line.split(" ");
 					Vector3f vertex = new Vector3f((float) Float.valueOf(currentLine[1]),
-							(float) Float.valueOf(currentLine[2]),
-							(float) Float.valueOf(currentLine[3]));
+							(float) Float.valueOf(currentLine[2]), (float) Float.valueOf(currentLine[3]));
 					Vertex newVertex = new Vertex(vertices.size(), vertex);
 					vertices.add(newVertex);
 
@@ -52,8 +51,7 @@ public class OBJFileLoader {
 				} else if (line.startsWith("vn ")) {
 					String[] currentLine = line.split(" ");
 					Vector3f normal = new Vector3f((float) Float.valueOf(currentLine[1]),
-							(float) Float.valueOf(currentLine[2]),
-							(float) Float.valueOf(currentLine[3]));
+							(float) Float.valueOf(currentLine[2]), (float) Float.valueOf(currentLine[3]));
 					normals.add(normal);
 				} else if (line.startsWith("f ")) {
 					break;
@@ -79,8 +77,8 @@ public class OBJFileLoader {
 		float[] texturesArray = new float[vertices.size() * 2];
 		float[] normalsArray = new float[vertices.size() * 3];
 		float[] tangentsArray = new float[vertices.size() * 3];
-		float furthest = convertDataToArrays(vertices, textures, normals, verticesArray,
-				texturesArray, normalsArray, tangentsArray);
+		float furthest = convertDataToArrays(vertices, textures, normals, verticesArray, texturesArray, normalsArray,
+				tangentsArray);
 		int[] indicesArray = convertIndicesListToArray(indices);
 		// ModelData data = new ModelData(verticesArray, texturesArray,
 		// normalsArray, tangentsArray, indicesArray,
@@ -88,8 +86,7 @@ public class OBJFileLoader {
 		return loader.loadToVAO(verticesArray, texturesArray, normalsArray, indicesArray);
 	}
 
-	private static void calculateTangents(Vertex v0, Vertex v1, Vertex v2,
-			List<Vector2f> textures) {
+	private static void calculateTangents(Vertex v0, Vertex v1, Vertex v2, List<Vector2f> textures) {
 		Vector3f delatPos1 = Vector3f.sub(v1.getPosition(), v0.getPosition(), null);
 		Vector3f delatPos2 = Vector3f.sub(v2.getPosition(), v0.getPosition(), null);
 		Vector2f uv0 = textures.get(v0.getTextureIndex());
@@ -108,8 +105,7 @@ public class OBJFileLoader {
 		v2.addTangent(tangent);
 	}
 
-	private static Vertex processVertex(String[] vertex, List<Vertex> vertices,
-			List<Integer> indices) {
+	private static Vertex processVertex(String[] vertex, List<Vertex> vertices, List<Integer> indices) {
 		int index = Integer.parseInt(vertex[0]) - 1;
 		Vertex currentVertex = vertices.get(index);
 		int textureIndex = Integer.parseInt(vertex[1]) - 1;
@@ -120,8 +116,7 @@ public class OBJFileLoader {
 			indices.add(index);
 			return currentVertex;
 		} else {
-			return dealWithAlreadyProcessedVertex(currentVertex, textureIndex, normalIndex, indices,
-					vertices);
+			return dealWithAlreadyProcessedVertex(currentVertex, textureIndex, normalIndex, indices, vertices);
 		}
 	}
 
@@ -133,9 +128,8 @@ public class OBJFileLoader {
 		return indicesArray;
 	}
 
-	private static float convertDataToArrays(List<Vertex> vertices, List<Vector2f> textures,
-			List<Vector3f> normals, float[] verticesArray, float[] texturesArray,
-			float[] normalsArray, float[] tangentsArray) {
+	private static float convertDataToArrays(List<Vertex> vertices, List<Vector2f> textures, List<Vector3f> normals,
+			float[] verticesArray, float[] texturesArray, float[] normalsArray, float[] tangentsArray) {
 		float furthestPoint = 0;
 		for (int i = 0; i < vertices.size(); i++) {
 			Vertex currentVertex = vertices.get(i);
@@ -162,16 +156,16 @@ public class OBJFileLoader {
 		return furthestPoint;
 	}
 
-	private static Vertex dealWithAlreadyProcessedVertex(Vertex previousVertex, int newTextureIndex,
-			int newNormalIndex, List<Integer> indices, List<Vertex> vertices) {
+	private static Vertex dealWithAlreadyProcessedVertex(Vertex previousVertex, int newTextureIndex, int newNormalIndex,
+			List<Integer> indices, List<Vertex> vertices) {
 		if (previousVertex.hasSameTextureAndNormal(newTextureIndex, newNormalIndex)) {
 			indices.add(previousVertex.getIndex());
 			return previousVertex;
 		} else {
 			Vertex anotherVertex = previousVertex.getDuplicateVertex();
 			if (anotherVertex != null) {
-				return dealWithAlreadyProcessedVertex(anotherVertex, newTextureIndex,
-						newNormalIndex, indices, vertices);
+				return dealWithAlreadyProcessedVertex(anotherVertex, newTextureIndex, newNormalIndex, indices,
+						vertices);
 			} else {
 				Vertex duplicateVertex = new Vertex(vertices.size(), previousVertex.getPosition());
 				duplicateVertex.setTextureIndex(newTextureIndex);
