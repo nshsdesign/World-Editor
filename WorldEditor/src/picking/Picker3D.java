@@ -1,6 +1,5 @@
 package picking;
 
-import java.awt.Color;
 import java.nio.FloatBuffer;
 import java.util.List;
 
@@ -11,16 +10,22 @@ import org.lwjgl.opengl.GL31;
 import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector2f;
 
+import entities.Camera;
 import entities.Entity;
+import main.OpenGLView;
+import postProcessing.Fbo;
+import postProcessing.FboBuilder.DepthBufferType;
 import renderEngine.DisplayManager;
 import renderEngine.Loader;
-import renderEngine.MasterRenderer;
+import toolbox.Colour;
+import toolbox.Maths;
+import toolbox.OpenglUtils;
 
 public class Picker3D {
 
 	private static final int MAX_INSTANCES = 8000;
 	private static final int INSTANCE_DATA_LENGTH = 4 + 4 + 4 + 4 + 2;
-	private static final Color WHITE = new Color(1, 1, 1);
+	private static final Colour WHITE = new Colour(1, 1, 1);
 	private static final int MAX_BYTE_VAL = 255;
 
 	private static final float[] VERTICES = { -0.5f, 0.5f, 0.5f, -0.5f, -0.5f, 0.5f, 0.5f, -0.5f, 0.5f, 0.5f, 0.5f,
@@ -45,9 +50,12 @@ public class Picker3D {
 	private FloatBuffer buffer = BufferUtils.createFloatBuffer(MAX_INSTANCES * INSTANCE_DATA_LENGTH * 4);
 
 	private PboDataDownloader downloader;
+	
+	private Camera camera;
 
-	public Picker3D() {
-		vao = Loader.createInterleavedVAO(VERTICES, INDICES, 3);
+	public Picker3D(Camera camera) {
+		this.camera = camera;
+		vao = OpenGLView.loader.createInterleavedVAO(VERTICES, INDICES, 3);
 		vbo = Loader.createInterleavedInstancedVbo(vao, MAX_INSTANCES, 1, 4, 4, 4, 4, 2);
 		fbo = Fbo.newFbo(DisplayManager.getWidth() / FBO_DOWNSCALE, DisplayManager.getHeight() / FBO_DOWNSCALE)
 				.nearestFiltering().setDepthBuffer(DepthBufferType.RENDER_BUFFER).create();
@@ -173,8 +181,8 @@ public class Picker3D {
 	}
 
 	private void calculateProjectionViewMatrix() {
-		Matrix4f projection = MasterRenderer.getProjectionMatrix();
-		Matrix4f view = EngineMaster.getCamera().getViewMatrix();
+		Matrix4f projection = OpenGLView.renderer.getProjectionMatrix();
+		Matrix4f view = Maths.createViewMatrix(camera);
 		Matrix4f.mul(projection, view, projectionView);
 	}
 

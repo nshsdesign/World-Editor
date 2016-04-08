@@ -3,6 +3,8 @@ package entities;
 import java.util.ArrayList;
 import java.util.List;
 
+import picking.BoundingBox;
+
 public class World {
 
 	private List<Entity> entities;
@@ -40,11 +42,9 @@ public class World {
 
 		for (int i = 0; i < info.length; i++) {
 			Entity e = entities.get(i);
-			BoundingBox b = e.getHitbox();
+			BoundingBox b = e.getBoundingBox();
 			info[i] = "e " + e.getName() + " " + e.position.x + " " + e.position.y + " " + e.position.z + " "
-					+ e.getRotX() + " " + e.getRotY() + " " + e.getRotZ() + " " + e.getScale() + " " + b.pos.x + " "
-					+ b.pos.y + " " + b.pos.z + " " + b.size.x + " " + b.size.y + " " + b.size.z + " "
-					+ e.getIsStatic();
+					+ e.getRotX() + " " + e.getRotY() + " " + e.getRotZ() + " " + e.getScale() + " " + e.getIsStatic();
 		}
 
 		return info;

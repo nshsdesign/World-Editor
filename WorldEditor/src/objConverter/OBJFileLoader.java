@@ -80,10 +80,10 @@ public class OBJFileLoader {
 		float furthest = convertDataToArrays(vertices, textures, normals, verticesArray, texturesArray, normalsArray,
 				tangentsArray);
 		int[] indicesArray = convertIndicesListToArray(indices);
-		// ModelData data = new ModelData(verticesArray, texturesArray,
-		// normalsArray, tangentsArray, indicesArray,
-		// furthest);
-		return loader.loadToVAO(verticesArray, texturesArray, normalsArray, indicesArray);
+		ModelData data = new ModelData(verticesArray, texturesArray,
+				normalsArray, tangentsArray, indicesArray,
+				furthest);
+		return loader.loadToVAO(verticesArray, texturesArray, normalsArray, indicesArray, data);
 	}
 
 	private static void calculateTangents(Vertex v0, Vertex v1, Vertex v2, List<Vector2f> textures) {

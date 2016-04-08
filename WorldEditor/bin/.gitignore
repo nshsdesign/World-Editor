@@ -7,3 +7,11 @@
 /shaders/
 /skybox/
 /water/
+/old/
+/normalMappingObjConverter/
+/objConverter/
+/terrains/
+/toolbox/
+/postProcessing/
+/worldParser/
+/models/

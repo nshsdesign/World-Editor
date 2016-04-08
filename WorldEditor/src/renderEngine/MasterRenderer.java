@@ -16,9 +16,7 @@ import entities.Light;
 import models.TexturedModel;
 import normalMappingRenderer.NormalMappingRenderer;
 import shaders.StaticShader;
-import shaders.TerrainShader;
 import skybox.SkyboxRenderer;
-import terrains.Terrain;
 
 public class MasterRenderer {
 
@@ -35,8 +33,8 @@ public class MasterRenderer {
 	private StaticShader shader = new StaticShader();
 	private EntityRenderer renderer;
 
-	private TerrainRenderer terrainRenderer;
-	private TerrainShader terrainShader = new TerrainShader();
+//	private TerrainRenderer terrainRenderer;
+//	private TerrainShader terrainShader = new TerrainShader();
 
 	private NormalMappingRenderer normalMapRenderer;
 
@@ -44,26 +42,26 @@ public class MasterRenderer {
 
 	private Map<TexturedModel, List<Entity>> entities = new HashMap<TexturedModel, List<Entity>>();
 	private Map<TexturedModel, List<Entity>> normalMapEntities = new HashMap<TexturedModel, List<Entity>>();
-	private List<Terrain> terrains = new ArrayList<Terrain>();
+//	private List<Terrain> terrains = new ArrayList<Terrain>();
 
 	public MasterRenderer(Loader loader) {
 		enableCulling();
 		createProjectionMatrix();
 		renderer = new EntityRenderer(shader, projectionMatrix);
-		terrainRenderer = new TerrainRenderer(terrainShader, projectionMatrix);
+//		terrainRenderer = new TerrainRenderer(terrainShader, projectionMatrix);
 		skyboxRenderer = new SkyboxRenderer(loader, projectionMatrix);
 		normalMapRenderer = new NormalMappingRenderer(projectionMatrix);
 	}
 
-	public static Matrix4f getProjectionMatrix() {
+	public Matrix4f getProjectionMatrix() {
 		return this.projectionMatrix;
 	}
 
-	public void renderScene(List<Entity> entities, List<Entity> normalEntities, List<Terrain> terrains,
+	public void renderScene(List<Entity> entities, List<Entity> normalEntities, //List<Terrain> terrains,
 			List<Light> lights, Camera camera, Vector4f clipPlane) {
-		for (Terrain terrain : terrains) {
-			processTerrain(terrain);
-		}
+//		for (Terrain terrain : terrains) {
+//			processTerrain(terrain);
+//		}
 		for (Entity entity : entities) {
 			processEntity(entity);
 		}
@@ -83,15 +81,15 @@ public class MasterRenderer {
 		renderer.render(entities);
 		shader.stop();
 		normalMapRenderer.render(normalMapEntities, clipPlane, lights, camera);
-		terrainShader.start();
-		terrainShader.loadClipPlane(clipPlane);
-		terrainShader.loadSkyColour(RED, GREEN, BLUE);
-		terrainShader.loadLights(lights);
-		terrainShader.loadViewMatrix(camera);
-		terrainRenderer.render(terrains);
-		terrainShader.stop();
+//		terrainShader.start();
+//		terrainShader.loadClipPlane(clipPlane);
+//		terrainShader.loadSkyColour(RED, GREEN, BLUE);
+//		terrainShader.loadLights(lights);
+//		terrainShader.loadViewMatrix(camera);
+//		terrainRenderer.render(terrains);
+//		terrainShader.stop();
 		skyboxRenderer.render(camera, RED, GREEN, BLUE);
-		terrains.clear();
+//		terrains.clear();
 		entities.clear();
 		normalMapEntities.clear();
 	}
@@ -105,9 +103,9 @@ public class MasterRenderer {
 		GL11.glDisable(GL11.GL_CULL_FACE);
 	}
 
-	public void processTerrain(Terrain terrain) {
-		terrains.add(terrain);
-	}
+//	public void processTerrain(Terrain terrain) {
+//		terrains.add(terrain);
+//	}
 
 	public void processEntity(Entity entity) {
 		TexturedModel entityModel = entity.getModel();
@@ -135,7 +133,7 @@ public class MasterRenderer {
 
 	public void cleanUp() {
 		shader.cleanUp();
-		terrainShader.cleanUp();
+//		terrainShader.cleanUp();
 		normalMapRenderer.cleanUp();
 	}
 

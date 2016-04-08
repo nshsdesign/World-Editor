@@ -19,7 +19,7 @@ public class DisplayManager {
 	private static float delta;
 
 	public static void createDisplay() {
-		ContextAttribs attribs = new ContextAttribs(3, 2).withForwardCompatible(true).withProfileCore(true);
+		ContextAttribs attribs = new ContextAttribs(3, 3).withForwardCompatible(true).withProfileCore(true);
 
 		try {
 			Display.setDisplayMode(new DisplayMode(WIDTH, HEIGHT));
@@ -52,6 +52,14 @@ public class DisplayManager {
 
 	private static long getCurrentTime() {
 		return Sys.getTime() * 1000 / Sys.getTimerResolution();
+	}
+
+	public static int getWidth() {
+		return WIDTH;
+	}
+	
+	public static int getHeight() {
+		return HEIGHT;
 	}
 
 }

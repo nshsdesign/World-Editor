@@ -12,9 +12,9 @@ import java.util.List;
 
 import org.lwjgl.util.vector.Vector3f;
 
-import entities.BoundingBox;
 import entities.Entity;
 import entities.World;
+import picking.BoundingBox;
 import renderEngine.Loader;
 
 public class WorldFileLoader {
@@ -50,12 +50,8 @@ public class WorldFileLoader {
 					Vector3f rot = new Vector3f((float) Float.valueOf(currentLine[5]),
 							(float) Float.valueOf(currentLine[6]), (float) Float.valueOf(currentLine[7]));
 					float scale = (float) Float.valueOf(currentLine[8]);
-					Vector3f boxPos = new Vector3f((float) Float.valueOf(currentLine[9]),
-							(float) Float.valueOf(currentLine[10]), (float) Float.valueOf(currentLine[11]));
-					Vector3f boxSize = new Vector3f((float) Float.valueOf(currentLine[12]),
-							(float) Float.valueOf(currentLine[13]), (float) Float.valueOf(currentLine[14]));
 
-					Entity e = new Entity(loader, name, pos, rot, scale, new BoundingBox(boxPos, boxSize));
+					Entity e = new Entity(loader, name, pos, rot, scale);
 					entities.add(e);
 
 				}

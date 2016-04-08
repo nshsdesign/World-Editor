@@ -12,6 +12,7 @@ import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 
 import models.RawModel;
+import objConverter.ModelData;
 import renderEngine.Loader;
 
 public class NormalMappedObjLoader {
@@ -79,8 +80,10 @@ public class NormalMappedObjLoader {
 		float furthest = convertDataToArrays(vertices, textures, normals, verticesArray, texturesArray, normalsArray,
 				tangentsArray);
 		int[] indicesArray = convertIndicesListToArray(indices);
-
-		return loader.loadToVAO(verticesArray, texturesArray, normalsArray, tangentsArray, indicesArray);
+		ModelData data = new ModelData(verticesArray, texturesArray,
+				normalsArray, tangentsArray, indicesArray,
+				furthest);
+		return loader.loadToVAO(verticesArray, texturesArray, normalsArray, indicesArray, data);
 	}
 
 	private static void calculateTangents(VertexNM v0, VertexNM v1, VertexNM v2, List<Vector2f> textures) {

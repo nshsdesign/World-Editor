@@ -1,13 +1,16 @@
 package entities;
 
+import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector3f;
 
 import models.RawModel;
 import models.TexturedModel;
 import objConverter.OBJFileLoader;
 import picking.AABB;
+import picking.BoundingBox;
 import renderEngine.Loader;
 import textures.ModelTexture;
+import toolbox.Maths;
 
 public class Entity {
 
@@ -15,10 +18,11 @@ public class Entity {
 	protected Vector3f position;
 	private float rotX, rotY, rotZ;
 	private float scale;
-	private BoundingBox hitbox;
+	private BoundingBox boundingBox;
 	private boolean isStatic;
 	private String name;
-
+	private Matrix4f modelMatrix = new Matrix4f();
+	
 	private int textureIndex = 0;
 
 	public Entity(Loader loader, String name, Vector3f position, float rotX, float rotY, float rotZ, float scale) {
@@ -28,6 +32,8 @@ public class Entity {
 		this.rotY = rotY;
 		this.rotZ = rotZ;
 		this.scale = scale;
+		this.boundingBox = new BoundingBox(this);
+		
 
 		RawModel rawModel = OBJFileLoader.loadOBJ(name, loader);
 		ModelTexture tex = new ModelTexture(loader.loadTexture("textureFiles", name));
@@ -43,24 +49,26 @@ public class Entity {
 		this.rotY = rotY;
 		this.rotZ = rotZ;
 		this.scale = scale;
+		this.boundingBox = new BoundingBox(this);
 
 		RawModel rawModel = OBJFileLoader.loadOBJ(name, loader);
 		ModelTexture tex = new ModelTexture(loader.loadTexture("textureFiles", name));
 		this.model = new TexturedModel(rawModel, tex);
 	}
 
-	public Entity(Loader loader, String name, Vector3f position, Vector3f rot, float scale, BoundingBox boundingBox) {
+	public Entity(Loader loader, String name, Vector3f position, Vector3f rot, float scale) {
 		this.name = name;
 		this.position = position;
 		this.rotX = rot.x;
 		this.rotY = rot.y;
 		this.rotZ = rot.z;
 		this.scale = scale;
-		this.hitbox = boundingBox;
 
 		RawModel rawModel = OBJFileLoader.loadOBJ(name, loader);
 		ModelTexture tex = new ModelTexture(loader.loadTexture("textureFiles", name));
 		this.model = new TexturedModel(rawModel, tex);
+
+		this.boundingBox = new BoundingBox(this);
 	}
 
 	public Entity(Entity e) {
@@ -70,7 +78,7 @@ public class Entity {
 		this.rotY = e.getRotY();
 		this.rotZ = e.getRotZ();
 		this.scale = e.getScale();
-		this.hitbox = e.getHitbox();
+		this.boundingBox = e.getBoundingBox();
 		this.model = e.getModel();
 	}
 
@@ -144,10 +152,6 @@ public class Entity {
 		this.scale = scale;
 	}
 
-	public BoundingBox getHitbox() {
-		return hitbox;
-	}
-
 	public boolean getIsStatic() {
 		return isStatic;
 	}
@@ -168,7 +172,30 @@ public class Entity {
 	}
 
 	public AABB getAABB() {
-		return null;
+		return boundingBox.getAABB();
 	}
 
+	public BoundingBox getBoundingBox() {
+		return boundingBox;
+	}
+
+	public Matrix4f getModelMatrix(){
+		Maths.updateTransformationMatrix(modelMatrix, position.x, position.y, position.z, rotX, rotY, rotZ, scale);
+		return modelMatrix;
+	}
+	
+	public void updateModelMatrix(Vector3f up, Vector3f forward) {
+		Matrix4f rotation = Maths.getRotationMatrix(up, forward);
+		modelMatrix.setIdentity();
+		Matrix4f.translate(position, modelMatrix, modelMatrix);
+		Matrix4f.mul(modelMatrix, rotation, modelMatrix);
+		Matrix4f.scale(new Vector3f(scale, scale, scale), modelMatrix, modelMatrix);
+	}
+	
+	public void update(){
+		Vector3f up = new Vector3f((float) Math.cos(Math.toRadians(rotZ)), (float) Math.sin(Math.toRadians(rotZ)), (float) Math.sin(Math.toRadians(rotY)));
+		Vector3f forward = new Vector3f((float) Math.cos(Math.toRadians(rotX)), (float) Math.sin(Math.toRadians(rotY)), (float) Math.tan(Math.toRadians(rotZ)));
+		updateModelMatrix(up, forward);
+	}
+	
 }

@@ -45,7 +45,7 @@ public class SkyboxRenderer {
 	private float time = 0;
 
 	public SkyboxRenderer(Loader loader, Matrix4f projectionMatrix) {
-		cube = loader.loadToVAO(VERTICES, 3);
+		cube = loader.loadToVAO(VERTICES, 3, null);
 		texture = loader.loadCubeMap(SUBFOLDER, TEXTURE_FILES);
 		nightTexture = loader.loadCubeMap(SUBFOLDER, NIGHT_TEXTURE_FILES);
 		shader = new SkyboxShader();

@@ -6,27 +6,26 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.lwjgl.LWJGLException;
-import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
-import entities.BoundingBox;
 import entities.Camera;
 import entities.Entity;
 import entities.Light;
 import entities.World;
 import guis.GuiRenderer;
 import guis.GuiTexture;
+import models.RawModel;
+import models.TexturedModel;
+import objConverter.OBJFileLoader;
+import picking.Picker3D;
 import renderEngine.DisplayManager;
 import renderEngine.Loader;
 import renderEngine.MasterRenderer;
-import terrains.Terrain;
-import textures.TerrainTexture;
-import textures.TerrainTexturePack;
-import toolbox.MousePicker;
+import textures.ModelTexture;
 import water.WaterFrameBuffers;
 import water.WaterRenderer;
 import water.WaterShader;
@@ -43,12 +42,18 @@ public class OpenGLView extends Canvas {
 	private World world;
 	private static boolean selectionPick = false;
 	private Entity currentSelection;
-	Loader loader;
+	public static Loader loader;
+	public static MasterRenderer renderer;
 	private static boolean createNew;
 
 	private Vector3f basePosition;
 
-	List<Entity> entities;
+	public static List<Entity> entities;
+	public static List<Entity> normalMapEntities;
+	public static List<Light> lights;
+	//public static List<Terrain> terrains;
+	public static List<GuiTexture> guiTextures;
+	public static Camera camera;
 
 	public OpenGLView(World world) {
 		try {
@@ -68,29 +73,29 @@ public class OpenGLView extends Canvas {
 		DisplayManager.createDisplay();
 		loader = new Loader();
 		WorldFileLoader.init(loader);
-		MasterRenderer renderer = new MasterRenderer(loader);
+		renderer = new MasterRenderer(loader);
 		GuiRenderer guiRenderer = new GuiRenderer(loader);
 
 		entities = new ArrayList<Entity>();
-		List<Entity> normalMapEntities = new ArrayList<Entity>();
-		List<Light> lights = new ArrayList<Light>();
-		List<Terrain> terrains = new ArrayList<Terrain>();
-		List<GuiTexture> guiTextures = new ArrayList<GuiTexture>();
+		normalMapEntities = new ArrayList<Entity>();
+		lights = new ArrayList<Light>();
+		//terrains = new ArrayList<Terrain>();
+		guiTextures = new ArrayList<GuiTexture>();
 
 		// Terrain Textures:
 
-		TerrainTexture backgroundTexture = new TerrainTexture(loader.loadTexture("terrain", "grassy3"));
-		TerrainTexture rTexture = new TerrainTexture(loader.loadTexture("terrain", "dirt"));
-		TerrainTexture gTexture = new TerrainTexture(loader.loadTexture("terrain", "pinkFlowers"));
-		TerrainTexture bTexture = new TerrainTexture(loader.loadTexture("terrain", "Cobblestone"));
-
-		TerrainTexturePack texturePack = new TerrainTexturePack(backgroundTexture, rTexture, gTexture, bTexture);
-		TerrainTexture blendMap = new TerrainTexture(loader.loadTexture("blendMaps", "blendMap3"));
-
-		Terrain terrain = new Terrain(0, 0, loader, texturePack, blendMap, "heightMap4");
-		Terrain terrain2 = new Terrain(1, 0, loader, texturePack, blendMap, "heightMap");
-		terrains.add(terrain);
-		terrains.add(terrain2);
+//		TerrainTexture backgroundTexture = new TerrainTexture(loader.loadTexture("terrain", "grassy3"));
+//		TerrainTexture rTexture = new TerrainTexture(loader.loadTexture("terrain", "dirt"));
+//		TerrainTexture gTexture = new TerrainTexture(loader.loadTexture("terrain", "pinkFlowers"));
+//		TerrainTexture bTexture = new TerrainTexture(loader.loadTexture("terrain", "Cobblestone"));
+//
+//		TerrainTexturePack texturePack = new TerrainTexturePack(backgroundTexture, rTexture, gTexture, bTexture);
+//		TerrainTexture blendMap = new TerrainTexture(loader.loadTexture("blendMaps", "blendMap3"));
+//
+//		Terrain terrain = new Terrain(0, 0, loader, texturePack, blendMap, "heightMap4");
+//		Terrain terrain2 = new Terrain(1, 0, loader, texturePack, blendMap, "heightMap");
+//		terrains.add(terrain);
+//		terrains.add(terrain2);
 
 		WaterFrameBuffers buffers = new WaterFrameBuffers();
 		WaterShader waterShader = new WaterShader();
@@ -105,23 +110,31 @@ public class OpenGLView extends Canvas {
 		Light sun = new Light(new Vector3f(0, 50000, 50000), new Vector3f(1f, 1f, 1f));
 		lights.add(sun);
 
-		Camera camera = new Camera();
+		camera = new Camera();
+		Picker3D picker = new Picker3D(camera);
 
-		MousePicker picker = new MousePicker(camera, renderer.getProjectionMatrix(), terrains.get(0));
+//		MousePicker picker = new MousePicker(camera, renderer.getProjectionMatrix(), terrains.get(0));
 
-		// TEMP
-		// Entity temp = new Entity(loader, "virus", new Vector3f(50, 40, 50),
-		// new Vector3f(0,0,0), 10, new BoundingBox(new Vector3f(0,0,0), new
-		// Vector3f(0,0,0)));
-		// entities.add(temp);
+//		 TEMP
+		 Entity temp = new Entity(loader, "virus", new Vector3f(50, 40, 50),
+				 new Vector3f(0,0,0), 10);
+		 entities.add(temp);
+		 entities.add(new Entity(loader,"virus", temp.getAABB().getMax(),
+				 new Vector3f(0,0,0), 2));
+		 entities.add(new Entity(loader,"virus", temp.getAABB().getMin(),
+				 new Vector3f(0,0,0), 2));
 
-		while (!Display.isCloseRequested()) {
+//		 System.out.println(temp.getAABB().getMax());
+		 
+		 while (!Display.isCloseRequested()) {
 
 			// TODO: make currentSelection the last placed object, and make add
 			// object and select object tools
 
 			camera.move();
-			picker.update();
+			picker.update(entities);
+			
+			if(picker.getPickedEntity() != null) System.out.println("Caught one!!!");
 			// temp.setRotY(temp.getRotY()+1);
 
 			if (createNew) {
@@ -130,8 +143,7 @@ public class OpenGLView extends Canvas {
 					entities.remove(currentSelection);
 				}
 				currentSelection = new Entity(loader, world.getCurrentObjectType(), new Vector3f(0, 0, 0),
-						new Vector3f(0, 0, 0), Main.stats[6],
-						new BoundingBox(new Vector3f(0, 0, 0), new Vector3f(0, 0, 0)));
+						new Vector3f(0, 0, 0), Main.stats[6]);
 				entities.add(currentSelection);
 				createNew = false;
 			}
@@ -141,12 +153,12 @@ public class OpenGLView extends Canvas {
 					currentSelection.setModel(loader, world.getCurrentObjectType());
 				}
 
-				if (picker.getCurrentTerrainPoint() != null && selectionPick) {
-					currentSelection.setPosition(picker.getCurrentTerrainPoint());
-					if (Mouse.isButtonDown(0))
-						selectionPick = false;
-					basePosition = currentSelection.getPosition();
-				}
+//				if (picker.getCurrentTerrainPoint() != null && selectionPick) {
+//					currentSelection.setPosition(picker.getCurrentTerrainPoint());
+//					if (Mouse.isButtonDown(0))
+//						selectionPick = false;
+//					basePosition = currentSelection.getPosition();
+//				}
 				if (basePosition == null) {
 					basePosition = new Vector3f(0, 0, 0);
 				}
@@ -167,20 +179,20 @@ public class OpenGLView extends Canvas {
 			float distance = 2 * (camera.getPosition().y - waters.get(0).getHeight());
 			camera.getPosition().y -= distance;
 			camera.invertPitch();
-			renderer.renderScene(entities, normalMapEntities, terrains, lights, camera,
+			renderer.renderScene(entities, normalMapEntities, lights, camera,
 					new Vector4f(0, 1, 0, -waters.get(0).getHeight() + 1));
 			camera.getPosition().y += distance;
 			camera.invertPitch();
 
 			// render refraction texture
 			buffers.bindRefractionFrameBuffer();
-			renderer.renderScene(entities, normalMapEntities, terrains, lights, camera,
+			renderer.renderScene(entities, normalMapEntities, lights, camera,
 					new Vector4f(0, -1, 0, waters.get(0).getHeight()));
 
 			// render to screen
 			GL11.glDisable(GL30.GL_CLIP_DISTANCE0);
 			buffers.unbindCurrentFrameBuffer();
-			renderer.renderScene(entities, normalMapEntities, terrains, lights, camera, new Vector4f(0, -1, 0, 100000));
+			renderer.renderScene(entities, normalMapEntities, lights, camera, new Vector4f(0, -1, 0, 100000));
 			waterRenderer.render(waters, camera, sun);
 			guiRenderer.render(guiTextures);
 
