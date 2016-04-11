@@ -119,9 +119,12 @@ public class OpenGLView extends Canvas {
 		 Entity temp = new Entity(loader, "virus", new Vector3f(50, 40, 50),
 				 new Vector3f(0,0,0), 10);
 		 entities.add(temp);
-		 entities.add(new Entity(loader,"virus", temp.getAABB().getMax(),
+		 Vector3f min = temp.getAABB().getMin();
+		 Vector3f max = temp.getAABB().getMax();
+		 Vector3f pos = temp.getPosition();
+		 entities.add(new Entity(loader,"virus", new Vector3f((min.x*temp.getScale())+pos.x,(min.y*temp.getScale())+pos.y,(min.z*temp.getScale())+pos.z),
 				 new Vector3f(0,0,0), 2));
-		 entities.add(new Entity(loader,"virus", temp.getAABB().getMin(),
+		 entities.add(new Entity(loader,"virus", new Vector3f((max.x*temp.getScale())+pos.x,(max.y*temp.getScale())+pos.y,(max.z*temp.getScale())+pos.z),
 				 new Vector3f(0,0,0), 2));
 
 //		 System.out.println(temp.getAABB().getMax());
