@@ -50,9 +50,10 @@ public class BoundingBox{
 	}
 
 	private void recalculate() {
-		Vector4f position = Matrix4f.transform(e.getModelMatrix(), aabb.getOffset(), null);
 		scale.set(aabb.getScale());
 		scale.scale(e.getScale());
+		Vector4f position = Matrix4f.transform(e.getModelMatrix(), aabb.getOffset(), null);
+//		scale.set(e.getScale(), e.getScale(), e.getScale());
 		Maths.updateModelMatrix(modelMatrix, new Vector3f(position), e.getRotX(), e.getRotY(),
 				e.getRotZ(), scale);
 		dirty = false;

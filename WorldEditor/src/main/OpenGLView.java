@@ -135,6 +135,9 @@ public class OpenGLView extends Canvas {
 			// object and select object tools
 
 			camera.move();
+//			for(Entity e: entities){
+//				e.update();
+//			}
 			picker.update(entities);
 			
 			if(picker.getPickedEntity() != null) System.out.println("Caught one!!!");

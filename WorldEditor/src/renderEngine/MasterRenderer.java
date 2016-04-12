@@ -144,6 +144,8 @@ public class MasterRenderer {
 	}
 
 	private void createProjectionMatrix() {
+		
+		
 		float aspectRatio = (float) Display.getWidth() / (float) Display.getHeight();
 		float y_scale = (float) ((1f / Math.tan(Math.toRadians(FOV / 2f))) * aspectRatio);
 		float x_scale = y_scale / aspectRatio;

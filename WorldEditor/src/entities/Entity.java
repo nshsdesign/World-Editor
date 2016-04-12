@@ -26,18 +26,11 @@ public class Entity {
 	private int textureIndex = 0;
 
 	public Entity(Loader loader, String name, Vector3f position, float rotX, float rotY, float rotZ, float scale) {
-		this.name = name;
-		this.position = position;
-		this.rotX = rotX;
-		this.rotY = rotY;
-		this.rotZ = rotZ;
-		this.scale = scale;
-		this.boundingBox = new BoundingBox(this);
-		
-
-		RawModel rawModel = OBJFileLoader.loadOBJ(name, loader);
-		ModelTexture tex = new ModelTexture(loader.loadTexture("textureFiles", name));
-		this.model = new TexturedModel(rawModel, tex);
+		this(loader, name, 0, position, rotX, rotY, rotZ, scale);
+	}
+	
+	public Entity(Loader loader, String name, Vector3f position, Vector3f rot, float scale) {
+		this(loader, name, 0, position, rot.x, rot.y, rot.z, scale);
 	}
 
 	public Entity(Loader loader, String name, int index, Vector3f position, float rotX, float rotY, float rotZ,
@@ -49,26 +42,14 @@ public class Entity {
 		this.rotY = rotY;
 		this.rotZ = rotZ;
 		this.scale = scale;
-		this.boundingBox = new BoundingBox(this);
-
-		RawModel rawModel = OBJFileLoader.loadOBJ(name, loader);
-		ModelTexture tex = new ModelTexture(loader.loadTexture("textureFiles", name));
-		this.model = new TexturedModel(rawModel, tex);
-	}
-
-	public Entity(Loader loader, String name, Vector3f position, Vector3f rot, float scale) {
-		this.name = name;
-		this.position = position;
-		this.rotX = rot.x;
-		this.rotY = rot.y;
-		this.rotZ = rot.z;
-		this.scale = scale;
 
 		RawModel rawModel = OBJFileLoader.loadOBJ(name, loader);
 		ModelTexture tex = new ModelTexture(loader.loadTexture("textureFiles", name));
 		this.model = new TexturedModel(rawModel, tex);
 
 		this.boundingBox = new BoundingBox(this);
+		
+		//modelMatrix = Maths.createTransformationMatrix(position, rotX, rotY, rotZ, scale);
 	}
 
 	public Entity(Entity e) {
@@ -184,18 +165,18 @@ public class Entity {
 		return modelMatrix;
 	}
 	
-	public void updateModelMatrix(Vector3f up, Vector3f forward) {
-		Matrix4f rotation = Maths.getRotationMatrix(up, forward);
-		modelMatrix.setIdentity();
-		Matrix4f.translate(position, modelMatrix, modelMatrix);
-		Matrix4f.mul(modelMatrix, rotation, modelMatrix);
-		Matrix4f.scale(new Vector3f(scale, scale, scale), modelMatrix, modelMatrix);
-	}
-	
-	public void update(){
-		Vector3f up = new Vector3f((float) Math.cos(Math.toRadians(rotZ)), (float) Math.sin(Math.toRadians(rotZ)), (float) Math.sin(Math.toRadians(rotY)));
-		Vector3f forward = new Vector3f((float) Math.cos(Math.toRadians(rotX)), (float) Math.sin(Math.toRadians(rotY)), (float) Math.tan(Math.toRadians(rotZ)));
-		updateModelMatrix(up, forward);
-	}
+//	public void updateModelMatrix(Vector3f up, Vector3f forward) {
+//		Matrix4f rotation = Maths.getRotationMatrix(up, forward);
+//		modelMatrix.setIdentity();
+//		Matrix4f.translate(position, modelMatrix, modelMatrix);
+//		Matrix4f.mul(modelMatrix, rotation, modelMatrix);
+//		Matrix4f.scale(new Vector3f(scale, scale, scale), modelMatrix, modelMatrix);
+//	}
+//	
+//	public void update(){
+//		Vector3f up = new Vector3f((float) Math.cos(Math.toRadians(rotZ)), (float) Math.sin(Math.toRadians(rotZ)), (float) Math.sin(Math.toRadians(rotY)));
+//		Vector3f forward = new Vector3f((float) Math.cos(Math.toRadians(rotX)), (float) Math.sin(Math.toRadians(rotX)), (float) Math.tan(Math.toRadians(rotZ)));
+//		updateModelMatrix(up, forward);
+//	}
 	
 }
