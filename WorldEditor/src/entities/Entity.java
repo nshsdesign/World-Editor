@@ -170,12 +170,12 @@ public class Entity {
 //		modelMatrix.setIdentity();
 //		Matrix4f.translate(position, modelMatrix, modelMatrix);
 //		Matrix4f.mul(modelMatrix, rotation, modelMatrix);
-//		Matrix4f.scale(new Vector3f(scale, scale, scale), modelMatrix, modelMatrix);
+//		//Matrix4f.scale(new Vector3f(scale, scale, scale), modelMatrix, modelMatrix);
 //	}
 //	
 //	public void update(){
-//		Vector3f up = new Vector3f((float) Math.cos(Math.toRadians(rotZ)), (float) Math.sin(Math.toRadians(rotZ)), (float) Math.sin(Math.toRadians(rotY)));
-//		Vector3f forward = new Vector3f((float) Math.cos(Math.toRadians(rotX)), (float) Math.sin(Math.toRadians(rotX)), (float) Math.tan(Math.toRadians(rotZ)));
+//		Vector3f up = new Vector3f(0,1,0);
+//		Vector3f forward = new Vector3f(1,0,0);
 //		updateModelMatrix(up, forward);
 //	}
 	

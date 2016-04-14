@@ -62,5 +62,21 @@ public class BoundingBox{
 	public AABB getAABB(){
 		return aabb;
 	}
+	
+	public Vector3f getMin(){
+		return null;
+	}
+	
+	public Vector3f getMax(){
+		return null;
+	}
+	
+	public boolean contains(Vector3f point){
+		return null;
+	}
+	
+	public boolean intersects(BoundingBox b){
+		return null;
+	}
 
 }

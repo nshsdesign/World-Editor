@@ -3,7 +3,7 @@ package entities;
 import java.util.ArrayList;
 import java.util.List;
 
-import picking.BoundingBox;
+import picking.AABB;
 
 public class World {
 
@@ -42,7 +42,7 @@ public class World {
 
 		for (int i = 0; i < info.length; i++) {
 			Entity e = entities.get(i);
-			BoundingBox b = e.getBoundingBox();
+			AABB aabb = e.getBoundingBox().getAABB();
 			info[i] = "e " + e.getName() + " " + e.position.x + " " + e.position.y + " " + e.position.z + " "
 					+ e.getRotX() + " " + e.getRotY() + " " + e.getRotZ() + " " + e.getScale() + " " + e.getIsStatic();
 		}
