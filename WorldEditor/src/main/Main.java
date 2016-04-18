@@ -41,11 +41,11 @@ public class Main extends JFrame {
 	public static final String RES_LOC = "res/";
 	public static final String WORLD_FOLDER_LOC = "worlds/";
 
-	private String name = "NONAME";
+	public static String name = "NONAME";
 	private String worldFile = "";
 
 	private JFileChooser worldFC;
-	private JButton openWorld;
+	private JButton openWorld, openButton;
 	private JTextField worldTF;
 	private JTextField nameTF;
 	private JLabel nameLabel;
@@ -313,19 +313,31 @@ public class Main extends JFrame {
 				int returnVal = worldFC.showOpenDialog(Main.this);
 				if (returnVal == JFileChooser.APPROVE_OPTION) {
 					File file = worldFC.getSelectedFile();
+					name = file.getName().substring(0,file.getName().length()-6);
 					worldFile = RES_LOC + WORLD_FOLDER_LOC + name + "/" + file.getName();
+					nameTF.setText(name);
 				}
 			}
 		});
 		openWorld.setBounds(400, 100, 25, 25);
 		openPane.add(openWorld);
+		
+		openButton = new JButton("Open");
+		openButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				OpenGLView.open = true;
+			}
+		});
+		openButton.setBounds(400, 140, 100, 25);
+		openPane.add(openButton);
 
 		openFrame.add(openPane);
 		// If this doesnt work, try using JDialog
 		openFrame.setTitle("Open File");
 		openFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		openFrame.setResizable(false);
-		openFrame.setSize(WIDTH - 200, HEIGHT - 200);
+		openFrame.setSize(600, 400);
 		openFrame.setLocationRelativeTo(null);
 		openFrame.setVisible(true);
 

@@ -14,8 +14,7 @@ import org.lwjgl.util.vector.Vector3f;
 
 import entities.Entity;
 import entities.World;
-import picking.BoundingBox;
-import renderEngine.Loader;
+import main.OpenGLView;
 
 public class WorldFileLoader {
 
@@ -24,7 +23,6 @@ public class WorldFileLoader {
 
 	private static final String RES_LOC = "res/";
 	private static final String SUBFOLDER = "worlds/";
-	private static Loader loader;
 	private static List<Entity> entities = new ArrayList<Entity>();
 	private static List<String> objectTypes = new ArrayList<String>();
 
@@ -43,7 +41,7 @@ public class WorldFileLoader {
 			line = reader.readLine();
 			while (line != null) {
 				if (line.startsWith("e ")) {
-					String[] currentLine = line.split("|");
+					String[] currentLine = line.split(" ");
 					String name = currentLine[1];
 					Vector3f pos = new Vector3f((float) Float.valueOf(currentLine[2]),
 							(float) Float.valueOf(currentLine[3]), (float) Float.valueOf(currentLine[4]));
@@ -51,7 +49,7 @@ public class WorldFileLoader {
 							(float) Float.valueOf(currentLine[6]), (float) Float.valueOf(currentLine[7]));
 					float scale = (float) Float.valueOf(currentLine[8]);
 
-					Entity e = new Entity(loader, name, pos, rot, scale);
+					Entity e = new Entity(OpenGLView.loader, name, pos, rot, scale);
 					entities.add(e);
 
 				}
@@ -100,9 +98,10 @@ public class WorldFileLoader {
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}
-
-		for (int i = 0; i < world.getEntityInfo().length; i++)
+		
+		for (int i = 0; i < world.getEntityInfo().length; i++){
 			writer.println(world.getEntityInfo()[i]);
+		}
 
 		writer.close();
 	}
@@ -117,10 +116,6 @@ public class WorldFileLoader {
 
 	public static List<Entity> getEntities() {
 		return entities;
-	}
-
-	public static void init(Loader l) {
-		loader = l;
 	}
 
 	public static String[] getObjectTypesArray() {

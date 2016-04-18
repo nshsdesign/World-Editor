@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.lwjgl.LWJGLException;
+import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL30;
@@ -18,14 +19,11 @@ import entities.Light;
 import entities.World;
 import guis.GuiRenderer;
 import guis.GuiTexture;
-import models.RawModel;
-import models.TexturedModel;
-import objConverter.OBJFileLoader;
 import picking.Picker3D;
 import renderEngine.DisplayManager;
 import renderEngine.Loader;
 import renderEngine.MasterRenderer;
-import textures.ModelTexture;
+import toolbox.MousePicker;
 import water.WaterFrameBuffers;
 import water.WaterRenderer;
 import water.WaterShader;
@@ -39,8 +37,9 @@ public class OpenGLView extends Canvas {
 	private static final int HEIGHT = 900 - 100 - 40 - 30;
 
 	private Thread glThread;
-	private World world;
+	public static World world;
 	private static boolean selectionPick = false;
+	public static boolean open = false;
 	private Entity currentSelection;
 	public static Loader loader;
 	public static MasterRenderer renderer;
@@ -66,13 +65,13 @@ public class OpenGLView extends Canvas {
 		setIgnoreRepaint(true);
 		setBounds(25, 40 + 30 + 25, WIDTH, HEIGHT);
 
-		this.world = world;
+		OpenGLView.world = world;
+		OpenGLView.world.setEntities(entities);
 	}
 
 	public void setupWorld() {
 		DisplayManager.createDisplay();
 		loader = new Loader();
-		WorldFileLoader.init(loader);
 		renderer = new MasterRenderer(loader);
 		GuiRenderer guiRenderer = new GuiRenderer(loader);
 
@@ -101,8 +100,8 @@ public class OpenGLView extends Canvas {
 		WaterShader waterShader = new WaterShader();
 		WaterRenderer waterRenderer = new WaterRenderer(loader, waterShader, renderer.getProjectionMatrix(), buffers);
 		List<WaterTile> waters = new ArrayList<WaterTile>();
-		for (int r = 0; r < 5; r++) {
-			for (int c = 0; c < 5; c++) {
+		for (int r = -5; r < 5; r++) {
+			for (int c = -5; c < 5; c++) {
 				waters.add(new WaterTile(r * 120 + 60, c * 120 + 60, 0));
 			}
 		}
@@ -113,19 +112,19 @@ public class OpenGLView extends Canvas {
 		camera = new Camera();
 		Picker3D picker = new Picker3D(camera);
 
-//		MousePicker picker = new MousePicker(camera, renderer.getProjectionMatrix(), terrains.get(0));
+		MousePicker picker2d = new MousePicker(camera, renderer.getProjectionMatrix());
 
-//		 TEMP
-		 Entity temp = new Entity(loader, "virus", new Vector3f(50, 40, 50),
-				 new Vector3f(0,0,0), 10);
-		 entities.add(temp);
-		 Vector3f min = temp.getAABB().getMin();
-		 Vector3f max = temp.getAABB().getMax();
-		 Vector3f pos = temp.getPosition();
-		 entities.add(new Entity(loader,"virus", new Vector3f((min.x*temp.getScale())+pos.x,(min.y*temp.getScale())+pos.y,(min.z*temp.getScale())+pos.z),
-				 new Vector3f(0,0,0), 2));
-		 entities.add(new Entity(loader,"virus", new Vector3f((max.x*temp.getScale())+pos.x,(max.y*temp.getScale())+pos.y,(max.z*temp.getScale())+pos.z),
-				 new Vector3f(0,0,0), 2));
+////		 TEMP
+//		 Entity temp = new Entity(loader, "virus", new Vector3f(50, 40, 50),
+//				 new Vector3f(0,0,0), 10);
+//		 entities.add(temp);
+//		 Vector3f min = temp.getAABB().getMin();
+//		 Vector3f max = temp.getAABB().getMax();
+//		 Vector3f pos = temp.getPosition();
+//		 entities.add(new Entity(loader,"virus", new Vector3f((min.x*temp.getScale())+pos.x,(min.y*temp.getScale())+pos.y,(min.z*temp.getScale())+pos.z),
+//				 new Vector3f(0,0,0), 2));
+//		 entities.add(new Entity(loader,"virus", new Vector3f((max.x*temp.getScale())+pos.x,(max.y*temp.getScale())+pos.y,(max.z*temp.getScale())+pos.z),
+//				 new Vector3f(0,0,0), 2));
 
 //		 System.out.println(temp.getAABB().getMax());
 		 
@@ -135,9 +134,9 @@ public class OpenGLView extends Canvas {
 			// object and select object tools
 
 			camera.move();
-			for(Entity e: entities){
-				e.update();
-			}
+//			for(Entity e: entities){
+//				e.update();
+//			}
 			picker.update(entities);
 			
 			if(picker.getPickedEntity() != null) System.out.println("Caught one!!!");
@@ -151,7 +150,15 @@ public class OpenGLView extends Canvas {
 				currentSelection = new Entity(loader, world.getCurrentObjectType(), new Vector3f(0, 0, 0),
 						new Vector3f(0, 0, 0), Main.stats[6]);
 				entities.add(currentSelection);
+				OpenGLView.world.setEntities(entities);
 				createNew = false;
+			}
+			
+			if(open){
+				WorldFileLoader.loadWorldFile(Main.WORLD_FOLDER_LOC + Main.name + "/" + Main.name);
+				world.setEntities(WorldFileLoader.getEntities());
+				OpenGLView.entities = world.getEntities();
+				open = false;
 			}
 
 			if (currentSelection != null) {
@@ -159,12 +166,12 @@ public class OpenGLView extends Canvas {
 					currentSelection.setModel(loader, world.getCurrentObjectType());
 				}
 
-//				if (picker.getCurrentTerrainPoint() != null && selectionPick) {
-//					currentSelection.setPosition(picker.getCurrentTerrainPoint());
-//					if (Mouse.isButtonDown(0))
-//						selectionPick = false;
-//					basePosition = currentSelection.getPosition();
-//				}
+				if (picker.getPickedEntity() == null && picker2d.getCurrentPoint() != null && selectionPick) {
+					currentSelection.setPosition(picker2d.getCurrentPoint());
+					if (Mouse.isButtonDown(0))
+						selectionPick = false;
+					basePosition = currentSelection.getPosition();
+				}
 				if (basePosition == null) {
 					basePosition = new Vector3f(0, 0, 0);
 				}

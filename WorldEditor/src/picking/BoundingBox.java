@@ -72,11 +72,11 @@ public class BoundingBox{
 	}
 	
 	public boolean contains(Vector3f point){
-		return null;
+		return false;
 	}
 	
 	public boolean intersects(BoundingBox b){
-		return null;
+		return false;
 	}
 
 }
