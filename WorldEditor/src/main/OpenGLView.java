@@ -139,7 +139,10 @@ public class OpenGLView extends Canvas {
 //			}
 			picker.update(entities);
 			
-			if(picker.getPickedEntity() != null) System.out.println("Caught one!!!");
+			if(picker.getPickedEntity() != null && Mouse.isButtonDown(0)){
+				currentSelection = picker.getPickedEntity();
+				System.out.println("got here");
+			}
 			// temp.setRotY(temp.getRotY()+1);
 
 			if (createNew) {

@@ -18,8 +18,7 @@ import main.OpenGLView;
 
 public class WorldFileLoader {
 
-	// e "model_file" "posX posY posZ" "rotX rotY rotZ" "scale" "boxposX boxposY
-	// boxposZ" " boxsizeX boxsizeY boxsizeZ" "isStatic"
+	// e "model_file" "posX posY posZ" "rotX rotY rotZ" "scale" "isStatic"
 
 	private static final String RES_LOC = "res/";
 	private static final String SUBFOLDER = "worlds/";
